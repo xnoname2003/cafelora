@@ -10,7 +10,7 @@ class RoleSeeder extends Seeder
 {
     public function run()
     {
-        $roles = ['admin', 'staff', 'customer'];
+        $roles = ['admin', 'staff'];
         foreach ($roles as $r) {
             Role::firstOrCreate(['name' => $r]);
         }
@@ -27,11 +27,5 @@ class RoleSeeder extends Seeder
             ['name'=>'Staff','password'=>bcrypt('password')]
         );
         $staff->assignRole('staff');
-
-        $customer = User::firstOrCreate(
-            ['email'=>'customer@cafelora.test'],
-            ['name'=>'Customer','password'=>bcrypt('password')]
-        );
-        $customer->assignRole('customer');
     }
 }

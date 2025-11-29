@@ -14,18 +14,5 @@ class RoleSeeder extends Seeder
         foreach ($roles as $r) {
             Role::firstOrCreate(['name' => $r]);
         }
-
-        // contoh user admin
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@cafelora.test'],
-            ['name'=>'Admin','password'=>bcrypt('password')]
-        );
-        $admin->assignRole('admin');
-
-        $staff = User::firstOrCreate(
-            ['email'=>'staff@cafelora.test'],
-            ['name'=>'Staff','password'=>bcrypt('password')]
-        );
-        $staff->assignRole('staff');
     }
 }

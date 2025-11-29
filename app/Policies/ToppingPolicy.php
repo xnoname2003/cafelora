@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Menu;
+use App\Models\Topping;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class MenuPolicy
+class ToppingPolicy
 {
     public function viewAny(User $user)
     {

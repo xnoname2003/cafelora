@@ -34,14 +34,29 @@ class UserResource extends Resource
 
             TextInput::make('password')
                 ->password()
-                ->dehydrateStateUsing(fn ($state) => $state ? Hash::make($state) : null)
-                ->dehydrated(fn ($state) => filled($state)),
+                ->revealable()
+                ->label('Password')
+                ->revealable()
+                ->dehydrateStateUsing(fn($state) => filled($state) ? Hash::make($state) : null)
+                ->dehydrated(fn($state) => filled($state))
+                ->afterStateHydrated(fn(TextInput $component, $state) => $component->state('')),
 
             Select::make('roles')
-                ->multiple()
-                ->relationship('roles', 'name')
+                ->label('Roles')
+                ->options(\Spatie\Permission\Models\Role::pluck('name', 'name'))
                 ->preload()
-                ->label('Roles'),
+                ->searchable()
+                ->afterStateHydrated(function (Select $component, ?User $record) {
+                    if ($record) {
+                        $component->state($record->roles->pluck('name')->toArray());
+                    }
+                })
+                ->dehydrateStateUsing(fn($state) => $state)
+                ->afterStateUpdated(function ($state, ?User $record) {
+                    if ($record) {
+                        $record->syncRoles($state);
+                    }
+                }),
         ]);
     }
 
@@ -93,9 +108,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListUsers::route('/'),
+            'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'edit'   => Pages\EditUser::route('/{record}/edit'),
+            'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 

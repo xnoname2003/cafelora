@@ -2,12 +2,16 @@
 
 namespace App\Policies;
 
-use App\Models\Menu;
+use App\Models\Category;
 use App\Models\User;
+use App\Models\Menu;
 use Illuminate\Auth\Access\Response;
 
-class MenuPolicy
+class CategoryPolicy
 {
+    /**
+     * Determine whether the user can view any models.
+     */
     public function viewAny(User $user)
     {
         // semua bisa melihat menu (customer, staff, admin)

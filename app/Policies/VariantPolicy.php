@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Menu;
 use App\Models\User;
+use App\Models\Variant;
 use Illuminate\Auth\Access\Response;
 
-class MenuPolicy
+class VariantPolicy
 {
     public function viewAny(User $user)
     {

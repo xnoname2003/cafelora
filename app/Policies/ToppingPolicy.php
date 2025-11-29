@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Topping;
 use App\Models\User;
+use App\Models\Menu;
 use Illuminate\Auth\Access\Response;
 
 class ToppingPolicy

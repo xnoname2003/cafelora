@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Variant;
+use App\Models\Menu;
 use Illuminate\Auth\Access\Response;
 
 class VariantPolicy

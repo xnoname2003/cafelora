@@ -12,6 +12,9 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use App\Filament\Resources\MenuResource\Pages;
+use Filament\Forms\Components\FileUpload;
+use Filament\Tables\Columns\TextColumn; 
+use Filament\Tables\Columns\ImageColumn; 
 
 class MenuResource extends Resource
 {
@@ -45,8 +48,8 @@ class MenuResource extends Resource
 
             Forms\Components\FileUpload::make('image')
                 ->label('Gambar (Maks 2MB)')
-                ->disk('public')
-                ->directory('menu-images')
+                ->disk('public') 
+                ->directory('menu-images') 
                 ->visibility('public')
                 ->maxSize(2048)
                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
@@ -61,15 +64,13 @@ class MenuResource extends Resource
                 ->relationship('variants', 'name')
                 ->multiple()
                 ->label('Varian Menu')
-                ->required()
-                ->preload(),
-
+                ->preload(), 
+            
             Forms\Components\Select::make('toppings')
                 ->relationship('toppings', 'name')
                 ->multiple()
                 ->label('Topping Menu')
-                ->required()
-                ->preload(),
+                ->preload(), 
         ]);
     }
 
@@ -80,20 +81,31 @@ class MenuResource extends Resource
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Menu')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('category.name')
-                    ->label('Kategori'),
+                    ->label('Kategori')
+                    ->sortable(),
 
+                TextColumn::make('description')
+                    ->label('Deskripsi')
+                    ->limit(40) 
+                    ->tooltip(fn ($state): ?string => $state) 
+                    ->wrap() 
+                    ->sortable(),
+                
                 Tables\Columns\ImageColumn::make('image')
-                    ->label('Gambar'),
+                    ->label('Gambar'), 
 
                 Tables\Columns\TextColumn::make('base_price')
                     ->label('Harga Dasar')
-                    ->money('IDR'),
+                    ->money('IDR') 
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('stock')
-                    ->label('Stok'),
+                    ->label('Stok')
+                    ->sortable(),
 
             ])
             ->actions([

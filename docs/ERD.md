@@ -10,7 +10,7 @@ Entity Relationship Diagram (ERD) ini menggambarkan struktur database dari siste
 5. Relasi Many-to-Many digunakan pada menu ↔ varian, menu ↔ topping, user ↔ role, serta role ↔ permission.
 6. Transaksi berjalan sesuai alur operasional cafe seperti pemesanan, perhitungan total, pembayaran, hingga pencetakan struk.
 
-<img width="1479" height="1028" alt="Image" src="https://github.com/user-attachments/assets/61072427-f297-4a3a-8c9e-2d04573c1559" />
+<img width="1264" height="1262" alt="ERD - Cafelora" src="https://github.com/user-attachments/assets/705af06a-d897-469c-b23e-ea317e1f3948" />
 
 ---
 ## Penjelasan Relasi Antar Tabel
@@ -172,17 +172,18 @@ Berfungsi untuk menyimpan menu makanan/minuman.
 - Many-to-Many → toppings  
 - One-to-Many → transaction_items  
 
-| Kolom       | Tipe Data | Fungsi                         |
-|-------------|-----------|--------------------------------|
-| id          | int       | Primary key                    |
-| category_id | int       | FK kategori                    |
-| name        | varchar   | Nama menu                      |
-| description | text      | Deskripsi                      |
-| base_price  | int       | Harga dasar                    |
-| image       | varchar   | Gambar                         |
-| stock       | int       | Stok menu                      |
-| created_at  | datetime  | Waktu dibuat                   |
-| updated_at  | datetime  | Waktu update                   |
+| Kolom       | Tipe Data | Fungsi                                 |
+|-------------|-----------|----------------------------------------|
+| id          | int       | Primary key                            |
+| category_id | int       | FK kategori                            |
+| name        | varchar   | Nama menu                              |
+| description | text      | Deskripsi                              |
+| base_price  | int       | Harga dasar                            |
+| image       | varchar   | Gambar                                 |
+| stock       | int       | Stok menu                              |
+| sales_qty   | int       | Total jumlah menu yang sudah terjual   |
+| created_at  | datetime  | Waktu dibuat                           |
+| updated_at  | datetime  | Waktu update                           |
 
 
 ## Tabel: menu_variant  _(Tabel Relasi Many-to-Many)_

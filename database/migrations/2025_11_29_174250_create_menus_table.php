@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->integer('base_price');
             $table->string('image')->nullable();
             $table->integer('stock')->default(0);
+            $table->integer('sales_qty')->default(0);
             $table->timestamps();
         });
     }

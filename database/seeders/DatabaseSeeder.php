@@ -14,11 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Pastikan role tersedia
-        $roles = ['admin', 'staff'];
-        foreach ($roles as $r) {
-            Role::firstOrCreate(['name' => $r]);
-        }
+        // Seed roles
+        $this->call(class: [
+            RoleSeeder::class,
+        ]);
 
         // Generate 5 user admin faker
         User::factory(5)->make()->each(function ($user) {

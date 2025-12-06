@@ -17,6 +17,7 @@ class Menu extends Model
         'base_price',
         'image',
         'stock',
+        'sales_qty',
     ];
 
     public function category()

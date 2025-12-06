@@ -53,13 +53,16 @@ class MenuSystemSeeder extends Seeder
         ];
 
         foreach ($menuNames as $name) {
+            $baseUrl = 'https://placehold.co/1920x1080?text=';
+            $fontImage = '&font=roboto';
             $menu = Menu::create([
                 'category_id' => Category::inRandomOrder()->first()->id,
                 'name' => $name,
                 'description' => "Delicious $name from our cafe.",
                 'base_price' => rand(15000, 35000),
                 'stock' => rand(5, 30),
-                'image' => null
+                'sales_qty' => rand(5, 30),
+                'image' => $baseUrl . urlencode($name) . $fontImage,
             ]);
 
             // Relasi topping acak 0–3 topping

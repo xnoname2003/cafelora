@@ -15,6 +15,8 @@ use App\Filament\Resources\MenuResource\Pages;
 use Filament\Forms\Components\FileUpload;
 use Filament\Tables\Columns\TextColumn; 
 use Filament\Tables\Columns\ImageColumn; 
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\TextEntry\TextEntrySize;
 
 class MenuResource extends Resource
 {

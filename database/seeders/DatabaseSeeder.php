@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
-use App\Models\Variant;
 
 class DatabaseSeeder extends Seeder
 {
@@ -52,12 +51,5 @@ class DatabaseSeeder extends Seeder
             MenuSystemSeeder::class,
         ]);
 
-        // Seed variants
-        Variant::insert([
-            ['name' => 'Regular', 'price_adjustment' => 0],
-            ['name' => 'Large', 'price_adjustment' => 5000],
-            ['name' => 'Hot', 'price_adjustment' => 0],
-            ['name' => 'Ice', 'price_adjustment' => 3000],
-        ]);
     }
 }

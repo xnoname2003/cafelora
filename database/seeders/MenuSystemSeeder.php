@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\Topping;
+use App\Models\Variant;
 use Illuminate\Database\Seeder;
 
 class MenuSystemSeeder extends Seeder
@@ -42,6 +43,18 @@ class MenuSystemSeeder extends Seeder
             Topping::firstOrCreate($t);
         }
 
+        //variants
+        $variants = [
+            ['name' => 'regular', 'price_adjustment' => 0],
+            ['name' => 'large', 'price_adjustment' => 5000],
+            ['name' => 'hot', 'price_adjustment' => 0],
+            ['name' => 'ice', 'price_adjustment' => 3000],
+        ];
+
+        foreach ($variants as $v) {
+            Variant::firstOrCreate($v);
+        }
+
         // menu items
         $menuNames = [
             'Americano', 'Cappuccino', 'Cafe Latte', 'Mocha',
@@ -72,6 +85,14 @@ class MenuSystemSeeder extends Seeder
                 ->toArray();
 
             $menu->toppings()->sync($randomToppings);
+
+            // Relasi variant acak 2 variant
+            $randomVariants = Variant::inRandomOrder()
+                ->limit(2)
+                ->pluck('id')
+                ->toArray();
+
+            $menu->variants()->sync($randomVariants);
         }
     }
 }

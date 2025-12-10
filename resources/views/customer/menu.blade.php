@@ -124,14 +124,14 @@
                 >
                 
                 <select 
-                    name="category_id"
+                    name="category"
                     class="w-full md:w-1/5 px-4 py-2 border border-soft-brown-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-soft-brown-100 text-soft-brown-700 bg-soft-brown-100"
                 >
                     <option value="">-- Pilih Kategori --</option>
                     @foreach ($allCategories as $category)
                         <option 
-                            value="{{ $category->id }}"
-                            {{ request('category_id') == $category->id ? 'selected' : '' }}
+                            value="{{ $category->name }}"
+                            {{ request('category') == $category->name ? 'selected' : '' }}
                         >
                             {{ $category->name }}
                         </option>
@@ -182,26 +182,20 @@
                     $firstMenuId = \Illuminate\Support\Str::slug($filteredMenus->first()->name);
                 }
                 
-                // LOGIC BARU UNTUK JUDUL PENCARIAN KATEGORI
                 $isCategoryOnlySearch = 
-                    request('category_id') && 
+                    request('category') && 
                     !request('search') && 
                     !request('min_price') && 
                     !request('max_price');
                 
                 $searchTitle = "Hasil Pencarian";
                 if ($isCategoryOnlySearch) {
-                    // Cari nama kategori yang dipilih
-                    $selectedCategory = $allCategories->firstWhere('id', request('category_id'));
-                    if ($selectedCategory) {
-                        $searchTitle = $selectedCategory->name;
-                    }
+                    // Cukup menggunakan nama kategori dari request
+                    $searchTitle = request('category');
                 } elseif (request('search')) {
                     $searchTitle = "Hasil Pencarian: \"" . request('search') . "\"";
                 }
                 
-                // 🚀 PENTING: KELOMPOKKAN MENU YANG DIFILTER BERDASARKAN KATEGORI
-                // Ini akan bekerja dengan baik jika menu memiliki relasi `category` (sudah diasumsikan di kode sebelumnya).
                 if (isset($isSearching) && $isSearching) {
                     $groupedMenus = $filteredMenus->groupBy(function($menu) {
                         return $menu->category->name ?? 'Lainnya'; 
@@ -219,7 +213,7 @@
                     @if ($filteredMenus->isEmpty())
                         <p class="text-lg text-soft-brown-500 italic">Menu tidak ditemukan dengan filter yang diterapkan.</p>
                     @else
-                        {{-- 🚀 MODIFIKASI: ITERASI BERDASARKAN KATEGORI YANG DIKELOMPOKKAN --}}
+                        {{-- ITERASI BERDASARKAN KATEGORI YANG DIKELOMPOKKAN --}}
                         @foreach ($groupedMenus as $categoryName => $menus)
                             <h3 class="text-2xl font-bold text-soft-brown-700 mb-4 mt-8">{{ $categoryName }}</h3>
                             
@@ -299,7 +293,6 @@
                                 @endforeach
                             </div>
                         @endforeach
-                        {{-- 🚀 AKHIR MODIFIKASI --}}
                     @endif
                 </section>
                 

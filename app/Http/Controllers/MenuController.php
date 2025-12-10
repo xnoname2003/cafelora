@@ -13,8 +13,10 @@ class MenuController extends Controller
         $searchQuery = $request->input('search');
         $minPrice = $request->input('min_price');
         $maxPrice = $request->input('max_price');
-        $categoryId = $request->input('category_id');
-        $isSearching = $searchQuery || $minPrice || $maxPrice || $categoryId;
+        $categoryName = $request->input('category'); 
+
+        $isSearching = $searchQuery || $minPrice || $maxPrice || $categoryName;
+        
         $allCategories = Category::orderBy('name')->get();
 
 
@@ -31,11 +33,18 @@ class MenuController extends Controller
             if ($maxPrice && is_numeric($maxPrice)) {
                 $query->where('base_price', '<=', $maxPrice); 
             }
-            if ($categoryId) {
-                $query->where('category_id', $categoryId); 
+            
+            if ($categoryName) {
+                $category = Category::where('name', $categoryName)->first(); 
+
+                if ($category) {
+                    $query->where('category_id', $category->id); 
+                } else {
+                    $query->whereRaw('1 = 0'); 
+                }
             }
-           
-            $filteredMenus = $query->with(['variants', 'toppings'])->get();
+            
+            $filteredMenus = $query->with(['variants', 'toppings', 'category'])->get();
 
             return view('customer.menu', [
                 'filteredMenus' => $filteredMenus,

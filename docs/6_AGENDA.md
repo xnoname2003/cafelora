@@ -1,6 +1,8 @@
 ---
 # Agenda Pekerjaan di GitHub
 
+---
+
 | No. | Nama               | Fitur                   | Deskripsi Progres                                                                                       | Tanggal Push GitHub |
 |-----|--------------------|-------------------------|---------------------------------------------------------------------------------------------------------|----------- |
 | 1.  | Chaerul Cahyadi    | Tidak Ada               | Inisialisasi Cafelora                                                                                   | 26/11/2025        |

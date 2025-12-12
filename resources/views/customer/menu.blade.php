@@ -6,7 +6,7 @@
     <title>Daftar Menu Cafelora</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-
+    
     <script>
         tailwind.config = {
             theme: {
@@ -27,17 +27,19 @@
     </script>
 
     <style>
+        .card {
+            transition: transform 0.5s ease-in-out, box-shadow 0.5s ease-in-out; 
+            cursor: pointer; 
+        }
         .card:hover {
             transform: scale(1.02); 
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-
         .menu-header-effect {
             text-align: center;
             position: relative;
             z-index: 10;
         }
-
         .menu-header-effect::before {
             content: 'OUR MENU'; 
             position: absolute;
@@ -88,7 +90,7 @@
                 <span class="text-3xl font-extrabold text-soft-brown-100">Cafelora</span>
             </div>
 
-            <form action="{{ url()->current() }}" method="GET" class="flex flex-col md:flex-row gap-3 w-full md:max-w-4xl justify-end">
+            <form action="{{ route('customer.menu.index') }}" method="GET" class="flex flex-col md:flex-row gap-3 w-full md:max-w-4xl justify-end">
                 
                 <div class="relative w-full md:w-1/3">
                     <input 
@@ -146,13 +148,14 @@
                 </button>
                 
                 @if (isset($isSearching) && $isSearching)
-                    <a href="{{ url()->current() }}" class="w-full md:w-auto px-4 py-2 bg-red-600 text-soft-brown-100 rounded-lg font-semibold hover:bg-red-700 text-center transition duration-150">
+                    <a href="{{ route('customer.menu.index') }}" class="w-full md:w-auto px-4 py-2 bg-red-600 text-soft-brown-100 rounded-lg font-semibold hover:bg-red-700 text-center transition duration-150">
                         Reset
                     </a>
                 @endif
             </form>
         </div>
     </nav>
+    
     <div class="pt-8"> 
         
         <header class="max-w-7xl mx-auto mb-12 px-8">
@@ -174,12 +177,11 @@
         
         <div class="max-w-7xl mx-auto space-y-20 px-8">
 
-            {{-- LOGIC MENU DISPLAY --}}
             @php
                 $firstMenuId = null;
 
                 if (isset($isSearching) && $isSearching && $filteredMenus->isNotEmpty()) {
-                    $firstMenuId = \Illuminate\Support\Str::slug($filteredMenus->first()->name);
+                    $firstMenuId = $filteredMenus->first()->id;
                 }
                 
                 $isCategoryOnlySearch = 
@@ -190,8 +192,7 @@
                 
                 $searchTitle = "Hasil Pencarian";
                 if ($isCategoryOnlySearch) {
-                    // Cukup menggunakan nama kategori dari request
-                    $searchTitle = request('category');
+                    $searchTitle = "Hasil Kategori: " . request('category');
                 } elseif (request('search')) {
                     $searchTitle = "Hasil Pencarian: \"" . request('search') . "\"";
                 }
@@ -201,7 +202,6 @@
                         return $menu->category->name ?? 'Lainnya'; 
                     });
                 }
-                
             @endphp
 
             @if (isset($isSearching) && $isSearching)
@@ -213,29 +213,24 @@
                     @if ($filteredMenus->isEmpty())
                         <p class="text-lg text-soft-brown-500 italic">Menu tidak ditemukan dengan filter yang diterapkan.</p>
                     @else
-                        {{-- ITERASI BERDASARKAN KATEGORI YANG DIKELOMPOKKAN --}}
                         @foreach ($groupedMenus as $categoryName => $menus)
                             <h3 class="text-2xl font-bold text-soft-brown-700 mb-4 mt-8">{{ $categoryName }}</h3>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-10">
                                 @foreach ($menus as $menu)
                                     @php
-                                        $menuSlugId = \Illuminate\Support\Str::slug($menu->name);
-                                        
-                                        // LOGIC WARNA SALES QTY
+                                        $menuId = $menu->id; 
                                         $salesQty = $menu->sales_qty ?? 0;
-                                        $salesColor = 'text-soft-brown-700';
-                                        if ($salesQty < 10) {
-                                            $salesColor = 'text-red-600';
-                                        } elseif ($salesQty >= 10 && $salesQty < 20) {
-                                            $salesColor = 'text-soft-brown-500';
-                                        } elseif ($salesQty >= 20 && $salesQty < 30) {
-                                            $salesColor = 'text-yellow-600';
-                                        } elseif ($salesQty >= 30) {
-                                            $salesColor = 'text-green-600';
-                                        }
+                                        $salesColor = ($salesQty < 10) ? 'text-red-600' : (($salesQty < 20) ? 'text-soft-brown-500' : (($salesQty < 30) ? 'text-yellow-600' : 'text-green-600'));
+                                        
+                                        $detailUrl = route('customer.menu.show', ['id' => $menu->id]);
                                     @endphp
-                                    <div class="card bg-soft-brown-100 rounded-2xl shadow-lg hover:shadow-xl transition duration-500 ease-in-out overflow-hidden transform cursor-pointer" id="{{ $menuSlugId }}">
+                                    
+                                    <a 
+                                        href="{{ $detailUrl }}" 
+                                        class="card bg-soft-brown-100 rounded-2xl shadow-lg hover:shadow-xl transition duration-500 ease-in-out overflow-hidden transform" 
+                                        id="menu-{{ $menuId }}"
+                                    >
                                         <div class="relative h-56 w-full">
                                             <img src="{{ $menu->image }}" alt="Gambar {{ $menu->name }}" class="w-full h-full object-cover">
                                         </div>
@@ -289,7 +284,7 @@
                                             </div>
 
                                         </div>
-                                    </div>
+                                    </a> 
                                 @endforeach
                             </div>
                         @endforeach
@@ -306,22 +301,18 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         @foreach ($category->menus as $menu)
                             @php
-                                $menuSlugId = \Illuminate\Support\Str::slug($menu->name);
-                                
-                                // LOGIC WARNA SALES QTY
+                                $menuId = $menu->id; 
                                 $salesQty = $menu->sales_qty ?? 0;
-                                $salesColor = 'text-soft-brown-700';
-                                if ($salesQty < 10) {
-                                    $salesColor = 'text-red-600';
-                                } elseif ($salesQty >= 10 && $salesQty < 20) {
-                                    $salesColor = 'text-soft-brown-500';
-                                } elseif ($salesQty >= 20 && $salesQty < 30) {
-                                    $salesColor = 'text-yellow-600';
-                                } elseif ($salesQty >= 30) {
-                                    $salesColor = 'text-green-600';
-                                }
+                                $salesColor = ($salesQty < 10) ? 'text-red-600' : (($salesQty < 20) ? 'text-soft-brown-500' : (($salesQty < 30) ? 'text-yellow-600' : 'text-green-600'));
+
+                                $detailUrl = route('customer.menu.show', ['id' => $menu->id]);
                             @endphp
-                            <div class="card bg-soft-brown-100 rounded-2xl shadow-lg hover:shadow-xl transition duration-500 ease-in-out overflow-hidden transform cursor-pointer" id="{{ $menuSlugId }}">
+                            
+                            <a 
+                                href="{{ $detailUrl }}" 
+                                class="card bg-soft-brown-100 rounded-2xl shadow-lg hover:shadow-xl transition duration-500 ease-in-out overflow-hidden transform" 
+                                id="menu-{{ $menuId }}"
+                            >
                                 <div class="relative h-56 w-full">
                                     <img src="{{ $menu->image }}" alt="Gambar {{ $menu->name }}" class="w-full h-full object-cover">
                                 </div>
@@ -363,7 +354,7 @@
                                             <div class="flex flex-wrap gap-2 min-h-[28px]">
                                                 @if ($menu->toppings->isNotEmpty())
                                                     @foreach ($menu->toppings as $topping)
-                                                        <span class="px-3 py-1 bg-soft-brown-500 text-soft-brown-100 rounded-full text-xs font-medium shadow-sm">
+                                                        <span class="px-3 py-1 bg-soft-brown-500 text-soft-brown-100 rounded-full text-sm font-medium shadow-sm">
                                                             {{ $topping->name }}
                                                         </span>
                                                     @endforeach
@@ -375,7 +366,7 @@
                                     </div>
                                     
                                 </div>
-                            </div>
+                            </a> 
                         @endforeach
                     </div>
                 </section>
@@ -386,22 +377,22 @@
     </div>
 
     <footer class="mt-16 text-center text-soft-brown-500 text-sm pb-8">
-        <p>&copy; {{ date('Y') }} Sistem {{ config('app.name', 'Restoran') }}. Dibuat dengan Laravel & Filament.</p>
+        <p>&copy; {{ date('Y') }} Sistem Cafelora. Dibuat dengan Laravel & Filament.</p>
     </footer>
 
-    @if (isset($isSearching) && $isSearching && $firstMenuId)
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var targetElement = document.getElementById('{{ $firstMenuId }}');
+        @if (isset($isSearching) && $isSearching && $firstMenuId)
+        document.addEventListener('DOMContentLoaded', () => {
+            const targetElement = document.getElementById('menu-{{ $firstMenuId }}');
             if (targetElement) {
-                var offset = targetElement.offsetTop - 120;
+                const offset = targetElement.offsetTop - 120; 
                 window.scrollTo({
                     top: offset,
                     behavior: 'smooth'
                 });
             }
         });
+        @endif
     </script>
-    @endif
 </body>
 </html>

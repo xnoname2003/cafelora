@@ -19,7 +19,6 @@ class MenuController extends Controller
         
         $allCategories = Category::orderBy('name')->get();
 
-
         if ($isSearching) {
             
             $query = Menu::query();
@@ -57,10 +56,8 @@ class MenuController extends Controller
             
             $categories = Category::with([
                 'menus' => function ($query) {
-                    $query->orderBy('sales_qty', 'desc');
-                },
-                'menus.variants',
-                'menus.toppings'
+                    $query->orderBy('sales_qty', 'desc')->with(['variants', 'toppings']);
+                }
             ])
             ->orderBy('name')
             ->get();
@@ -69,8 +66,35 @@ class MenuController extends Controller
                 'categories' => $categories,
                 'isSearching' => false,
                 'filteredMenus' => collect(), 
-                'allCategories' => $allCategories, 
+                'allCategories' => $allCategories,
             ]);
         }
+    }
+
+    public function showCustomer($id)
+    {
+        $menu = Menu::findOrFail($id);
+
+        return view('customer.menu-detail', [
+            'menu' => $menu,
+        ]);
+    }
+    
+    public function showByCategory($name)
+    {
+        $category = Category::where('name', $name)->firstOrFail();
+
+        $menus = Menu::where('category_id', $category->id)
+                      ->with(['variants', 'toppings', 'category'])
+                      ->get();
+
+        $allCategories = Category::orderBy('name')->get();
+        
+        return view('customer.menu', [
+            'filteredMenus' => $menus,
+            'isSearching' => true, 
+            'categories' => collect(), 
+            'allCategories' => $allCategories, 
+        ]);
     }
 }

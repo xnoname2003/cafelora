@@ -8,6 +8,7 @@ use App\Models\Category;
 
 class MenuController extends Controller
 {
+    // === METHOD 1: indexCustomer (Menampilkan Daftar Menu dan Filter Form) ===
     public function indexCustomer(Request $request)
     {
         $searchQuery = $request->input('search');
@@ -44,12 +45,16 @@ class MenuController extends Controller
             }
             
             $filteredMenus = $query->with(['variants', 'toppings', 'category'])->get();
+            
+            $firstMenuId = $filteredMenus->isNotEmpty() ? $filteredMenus->first()->id : null;
+
 
             return view('customer.menu', [
                 'filteredMenus' => $filteredMenus,
                 'isSearching' => true,
                 'categories' => collect(), 
                 'allCategories' => $allCategories, 
+                'firstMenuId' => $firstMenuId,
             ]);
 
         } else {
@@ -67,34 +72,41 @@ class MenuController extends Controller
                 'isSearching' => false,
                 'filteredMenus' => collect(), 
                 'allCategories' => $allCategories,
+                'firstMenuId' => null,
             ]);
         }
     }
 
-    public function showCustomer($id)
+    // === METHOD 2: showCustomer (Untuk menampilkan Halaman Detail Menu) ===
+    public function showCustomer(Menu $menu)
     {
-        $menu = Menu::findOrFail($id);
+        $menu->load(['category', 'variants', 'toppings']);
 
         return view('customer.menu-detail', [
             'menu' => $menu,
         ]);
     }
     
+    // === METHOD 3: showByCategory (Untuk Tautan Kategori dari menu utama) ===
     public function showByCategory($name)
     {
         $category = Category::where('name', $name)->firstOrFail();
-
+        
         $menus = Menu::where('category_id', $category->id)
                       ->with(['variants', 'toppings', 'category'])
+                      ->orderBy('sales_qty', 'desc')
                       ->get();
-
+                      
         $allCategories = Category::orderBy('name')->get();
+        
+        $firstMenuId = $menus->isNotEmpty() ? $menus->first()->id : null;
         
         return view('customer.menu', [
             'filteredMenus' => $menus,
             'isSearching' => true, 
             'categories' => collect(), 
             'allCategories' => $allCategories, 
+            'firstMenuId' => $firstMenuId,
         ]);
     }
 }

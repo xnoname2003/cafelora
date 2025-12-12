@@ -86,6 +86,7 @@
 
 <body class="bg-soft-brown-200 min-h-screen">
 
+    {{-- Navigasi --}}
     <nav class="w-full bg-soft-brown-300 shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center py-4 px-8 space-y-3 md:space-y-0"> 
             
@@ -158,6 +159,7 @@
             </form>
         </div>
     </nav>
+    {{-- END Navigasi --}}
     
     <div class="pt-8"> 
         
@@ -180,6 +182,7 @@
         
         <div class="max-w-7xl mx-auto space-y-20 px-8">
 
+            {{-- LOGIKA DISPLAY MENU --}}
             @if (isset($isSearching) && $isSearching)
                 {{-- BLOK 1: Tampilan saat ada filter/pencarian --}}
                 
@@ -285,6 +288,7 @@
                 </section>
                 
             @else
+                {{-- BLOK 2: TAMPILAN DEFAULT BERDASARKAN KATEGORI --}}
                 @foreach ($categories as $category)
                 <section>
                     <a href="{{ route('customer.category.show', ['name' => $category->name]) }}">
@@ -375,6 +379,7 @@
         <p>&copy; {{ date('Y') }} Sistem {{ config('app.name', 'Restoran') }}. Dibuat dengan Laravel & Filament.</p>
     </footer>
 
+    {{-- Script untuk scrolling hasil pencarian --}}
     @if (isset($isSearching) && $isSearching && $firstMenuId)
     <script>
         document.addEventListener('DOMContentLoaded', function() {

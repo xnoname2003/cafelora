@@ -25,18 +25,19 @@
     </script>
     <style>
         .price-chip {
-            background-color: #A0522D; 
-            color: #FAF0E6;
+            background-color: #A0522D; /* soft-brown-500 */
+            color: #FAF0E6; /* soft-brown-100 */
             font-weight: bold;
             padding: 2px 8px;
             border-radius: 9999px;
-            font-size: 0.75rem; 
+            font-size: 0.75rem; /* text-xs */
             margin-left: 0.5rem;
         }
     </style>
 </head>
 <body class="bg-soft-brown-200 min-h-screen">
 
+    {{-- Navigasi --}}
     <nav class="w-full bg-soft-brown-300 shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex items-center py-4 px-8"> 
             <a href="{{ route('customer.menu.index') }}" class="text-xl font-bold text-soft-brown-100 hover:text-white transition">
@@ -51,6 +52,7 @@
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16">
                 
+                {{-- Bagian Kiri: Gambar --}}
                 <div>
                     @if ($menu->image)
                     <img 
@@ -65,6 +67,7 @@
                     @endif
                 </div>
 
+                {{-- Bagian Kanan: Detail --}}
                 <div>
                     <span class="inline-block px-4 py-1 mb-3 text-sm font-semibold rounded-full bg-soft-brown-300 text-soft-brown-700">
                         {{ $menu->category->name ?? 'Tanpa Kategori' }}
@@ -108,6 +111,7 @@
                             </div>
                         </div>
                         
+                        {{-- Topping (dengan harga extra_price) --}}
                         <div>
                             <h3 class="text-lg font-bold text-soft-brown-700 mb-2">Topping Tersedia:</h3>
                             <div class="flex flex-wrap gap-3">
@@ -142,10 +146,6 @@
     </div>
 
     <footer class="mt-16 text-center text-soft-brown-500 text-sm pb-8">
-        <p>&copy; {{ date('Y') }} Sistem Cafelora.</p>
-    </footer>
-</body>
-</html>ext-sm pb-8">
         <p>&copy; {{ date('Y') }} Sistem Cafelora.</p>
     </footer>
 </body>

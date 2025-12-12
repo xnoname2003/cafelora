@@ -5,4 +5,10 @@ use App\Http\Controllers\MenuController;
 
 Route::get('/', [MenuController::class, 'indexCustomer'])->name('customer.menu.index');
 
+<<<<<<< Updated upstream
 Route::get('/menu/{id}', [MenuController::class, 'showCustomer'])->name('customer.menu.show');
+=======
+Route::get('/category/{name}', [MenuController::class, 'showByCategory'])->name('customer.category.show');
+
+Route::get('/menu/{menu}', [MenuController::class, 'showCustomer'])->name('customer.menu.show');
+>>>>>>> Stashed changes

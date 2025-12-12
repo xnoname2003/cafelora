@@ -20,6 +20,11 @@ class Menu extends Model
         'sales_qty',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'name';
+    }
+    
     public function category()
     {
         return $this->belongsTo(Category::class);

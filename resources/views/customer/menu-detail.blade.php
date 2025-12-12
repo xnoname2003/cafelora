@@ -23,10 +23,20 @@
             }
         }
     </script>
+    <style>
+        .price-chip {
+            background-color: #A0522D; 
+            color: #FAF0E6;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem; 
+            margin-left: 0.5rem;
+        }
+    </style>
 </head>
 <body class="bg-soft-brown-200 min-h-screen">
 
-    {{-- Navigasi --}}
     <nav class="w-full bg-soft-brown-300 shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex items-center py-4 px-8"> 
             <a href="{{ route('customer.menu.index') }}" class="text-xl font-bold text-soft-brown-100 hover:text-white transition">
@@ -41,16 +51,20 @@
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16">
                 
-                {{-- Bagian Kiri: Gambar --}}
                 <div>
+                    @if ($menu->image)
                     <img 
                         src="{{ $menu->image }}" 
                         alt="Gambar {{ $menu->name }}" 
                         class="w-full h-96 object-cover rounded-xl shadow-lg border-4 border-soft-brown-300"
                     >
+                    @else
+                    <div class="w-full h-96 flex items-center justify-center rounded-xl shadow-lg border-4 border-soft-brown-300 bg-soft-brown-200 text-soft-brown-700 font-bold text-xl">
+                        Gambar Tidak Tersedia
+                    </div>
+                    @endif
                 </div>
 
-                {{-- Bagian Kanan: Detail --}}
                 <div>
                     <span class="inline-block px-4 py-1 mb-3 text-sm font-semibold rounded-full bg-soft-brown-300 text-soft-brown-700">
                         {{ $menu->category->name ?? 'Tanpa Kategori' }}
@@ -72,13 +86,21 @@
                     </div>
 
                     <div class="space-y-6">
-                        {{-- Varian --}}
+                        
+                        {{-- Varian (dengan harga extra_price) --}}
                         <div>
                             <h3 class="text-lg font-bold text-soft-brown-700 mb-2">Pilihan Varian:</h3>
                             <div class="flex flex-wrap gap-3">
                                 @forelse ($menu->variants as $variant)
-                                    <span class="px-4 py-2 bg-soft-brown-200 text-soft-brown-700 border border-soft-brown-500 rounded-full text-sm font-medium shadow-sm">
-                                        {{ $variant->name }} (+Rp{{ number_format($variant->extra_price, 0, ',', '.') }})
+                                    <span class="inline-flex items-center px-4 py-2 bg-soft-brown-200 text-soft-brown-700 border border-soft-brown-500 rounded-full text-sm font-medium shadow-sm">
+                                        {{ $variant->name }} 
+                                        {{-- Tampilkan harga jika ada --}}
+                                        @if (isset($variant->price) && $variant->price > 0) 
+                                            <span class="price-chip">+Rp{{ number_format($variant->price, 0, ',', '.') }}</span>
+                                        @elseif (isset($variant->extra_price) && $variant->extra_price > 0) 
+                                            {{-- Menggunakan variable yang Anda berikan: extra_price --}}
+                                            <span class="price-chip">+Rp{{ number_format($variant->extra_price, 0, ',', '.') }}</span>
+                                        @endif
                                     </span>
                                 @empty
                                     <span class="text-soft-brown-500 italic">Tidak ada varian yang tersedia.</span>
@@ -86,13 +108,19 @@
                             </div>
                         </div>
                         
-                        {{-- Topping --}}
                         <div>
                             <h3 class="text-lg font-bold text-soft-brown-700 mb-2">Topping Tersedia:</h3>
                             <div class="flex flex-wrap gap-3">
                                 @forelse ($menu->toppings as $topping)
-                                    <span class="px-4 py-2 bg-soft-brown-500 text-soft-brown-100 rounded-full text-sm font-medium shadow-sm">
-                                        {{ $topping->name }} (+Rp{{ number_format($topping->extra_price, 0, ',', '.') }})
+                                    <span class="inline-flex items-center px-4 py-2 bg-soft-brown-500 text-soft-brown-100 rounded-full text-sm font-medium shadow-sm">
+                                        {{ $topping->name }} 
+                                        {{-- Tampilkan harga jika ada --}}
+                                        @if (isset($topping->price) && $topping->price > 0)
+                                            <span class="price-chip bg-soft-brown-700">+Rp{{ number_format($topping->price, 0, ',', '.') }}</span>
+                                        @elseif (isset($topping->extra_price) && $topping->extra_price > 0) 
+                                            {{-- Menggunakan variable yang Anda berikan: extra_price --}}
+                                            <span class="price-chip bg-soft-brown-700">+Rp{{ number_format($topping->extra_price, 0, ',', '.') }}</span>
+                                        @endif
                                     </span>
                                 @empty
                                     <span class="text-soft-brown-500 italic">Tidak ada topping yang tersedia.</span>
@@ -114,6 +142,10 @@
     </div>
 
     <footer class="mt-16 text-center text-soft-brown-500 text-sm pb-8">
+        <p>&copy; {{ date('Y') }} Sistem Cafelora.</p>
+    </footer>
+</body>
+</html>ext-sm pb-8">
         <p>&copy; {{ date('Y') }} Sistem Cafelora.</p>
     </footer>
 </body>

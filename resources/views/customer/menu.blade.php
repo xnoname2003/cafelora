@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Menu Cafelora</title>
 
+    @php
+        use Illuminate\Support\Str; 
+        $allCategories = $allCategories ?? collect(); 
+    @endphp
+
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script>
@@ -69,12 +74,10 @@
             height: 60px; 
             overflow: hidden;
         }
-
         .fixed-description {
             height: 48px; 
             overflow: hidden;
         }
-        
         .fixed-option-area {
             min-height: 120px; 
         }
@@ -139,7 +142,7 @@
                         </option>
                     @endforeach
                 </select>
-
+                
                 <button 
                     type="submit" 
                     class="w-full md:w-auto px-4 py-2 bg-soft-brown-700 text-soft-brown-100 rounded-lg font-semibold hover:bg-olive-dark transition duration-150"
@@ -147,7 +150,7 @@
                     Cari
                 </button>
                 
-                @if (isset($isSearching) && $isSearching)
+                @if (request('search') || request('min_price') || request('max_price') || request('category'))
                     <a href="{{ route('customer.menu.index') }}" class="w-full md:w-auto px-4 py-2 bg-red-600 text-soft-brown-100 rounded-lg font-semibold hover:bg-red-700 text-center transition duration-150">
                         Reset
                     </a>
@@ -177,34 +180,24 @@
         
         <div class="max-w-7xl mx-auto space-y-20 px-8">
 
-            @php
-                $firstMenuId = null;
+            @if (isset($isSearching) && $isSearching)
+                {{-- BLOK 1: Tampilan saat ada filter/pencarian --}}
+                
+                @php
+                    $searchTitle = "Hasil Pencarian";
+                    if (request()->routeIs('customer.category.show')) {
+                        $searchTitle = "Menu Kategori: " . request()->route('name');
+                    } elseif (request('category') && !request('search') && !request('min_price') && !request('max_price')) {
+                        $searchTitle = "Hasil Kategori: " . request('category');
+                    } elseif (request('search')) {
+                        $searchTitle = "Hasil Pencarian: \"" . request('search') . "\"";
+                    }
 
-                if (isset($isSearching) && $isSearching && $filteredMenus->isNotEmpty()) {
-                    $firstMenuId = $filteredMenus->first()->id;
-                }
-                
-                $isCategoryOnlySearch = 
-                    request('category') && 
-                    !request('search') && 
-                    !request('min_price') && 
-                    !request('max_price');
-                
-                $searchTitle = "Hasil Pencarian";
-                if ($isCategoryOnlySearch) {
-                    $searchTitle = "Hasil Kategori: " . request('category');
-                } elseif (request('search')) {
-                    $searchTitle = "Hasil Pencarian: \"" . request('search') . "\"";
-                }
-                
-                if (isset($isSearching) && $isSearching) {
                     $groupedMenus = $filteredMenus->groupBy(function($menu) {
                         return $menu->category->name ?? 'Lainnya'; 
                     });
-                }
-            @endphp
+                @endphp
 
-            @if (isset($isSearching) && $isSearching)
                 <section>
                     <h2 class="text-3xl font-extrabold text-soft-brown-700 mb-6 uppercase tracking-wide">
                         {{ $searchTitle }}
@@ -219,17 +212,18 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-10">
                                 @foreach ($menus as $menu)
                                     @php
-                                        $menuId = $menu->id; 
+                                        $detailUrl = route('customer.menu.show', $menu);
+                                        
                                         $salesQty = $menu->sales_qty ?? 0;
                                         $salesColor = ($salesQty < 10) ? 'text-red-600' : (($salesQty < 20) ? 'text-soft-brown-500' : (($salesQty < 30) ? 'text-yellow-600' : 'text-green-600'));
                                         
-                                        $detailUrl = route('customer.menu.show', ['id' => $menu->id]);
+                                        $shortDescription = Str::words($menu->description, 15, '...');
                                     @endphp
                                     
                                     <a 
                                         href="{{ $detailUrl }}" 
                                         class="card bg-soft-brown-100 rounded-2xl shadow-lg hover:shadow-xl transition duration-500 ease-in-out overflow-hidden transform" 
-                                        id="menu-{{ $menuId }}"
+                                        id="menu-{{ $menu->id }}"
                                     >
                                         <div class="relative h-56 w-full">
                                             <img src="{{ $menu->image }}" alt="Gambar {{ $menu->name }}" class="w-full h-full object-cover">
@@ -237,7 +231,7 @@
                                         <div class="p-6">
                                             <h3 class="text-2xl font-bold mb-1 text-soft-brown-700 fixed-title">{{ $menu->name }}</h3>
                                             
-                                            <p class="mt-2 text-soft-brown-500 text-sm fixed-description">{{ $menu->description ?? 'Deskripsi tidak tersedia.' }}</p>
+                                            <p class="mt-2 text-soft-brown-500 text-sm fixed-description">{{ $shortDescription ?? 'Deskripsi tidak tersedia.' }}</p>
                                             
                                             <hr class="my-4 border-soft-brown-200">
                                             <div class="flex justify-between items-center mb-4">
@@ -282,7 +276,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
                                         </div>
                                     </a> 
                                 @endforeach
@@ -294,24 +287,27 @@
             @else
                 @foreach ($categories as $category)
                 <section>
-                    <h2 class="text-3xl font-extrabold text-soft-brown-700 mb-6 uppercase tracking-wide">
-                        {{ $category->name }}
-                    </h2>
+                    <a href="{{ route('customer.category.show', ['name' => $category->name]) }}">
+                        <h2 class="text-3xl font-extrabold text-soft-brown-700 mb-6 uppercase tracking-wide hover:text-soft-brown-500 transition duration-150">
+                            {{ $category->name }} &rarr;
+                        </h2>
+                    </a>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         @foreach ($category->menus as $menu)
                             @php
-                                $menuId = $menu->id; 
+                                $detailUrl = route('customer.menu.show', $menu);
+                                
                                 $salesQty = $menu->sales_qty ?? 0;
                                 $salesColor = ($salesQty < 10) ? 'text-red-600' : (($salesQty < 20) ? 'text-soft-brown-500' : (($salesQty < 30) ? 'text-yellow-600' : 'text-green-600'));
 
-                                $detailUrl = route('customer.menu.show', ['id' => $menu->id]);
+                                $shortDescription = Str::words($menu->description, 15, '...');
                             @endphp
                             
                             <a 
                                 href="{{ $detailUrl }}" 
                                 class="card bg-soft-brown-100 rounded-2xl shadow-lg hover:shadow-xl transition duration-500 ease-in-out overflow-hidden transform" 
-                                id="menu-{{ $menuId }}"
+                                id="menu-{{ $menu->id }}"
                             >
                                 <div class="relative h-56 w-full">
                                     <img src="{{ $menu->image }}" alt="Gambar {{ $menu->name }}" class="w-full h-full object-cover">
@@ -319,7 +315,7 @@
                                 <div class="p-6">
                                     <h3 class="text-2xl font-bold mb-1 text-soft-brown-700 fixed-title">{{ $menu->name }}</h3>
                                     
-                                    <p class="mt-2 text-soft-brown-500 text-sm fixed-description">{{ $menu->description ?? 'Deskripsi tidak tersedia.' }}</p>
+                                    <p class="mt-2 text-soft-brown-500 text-sm fixed-description">{{ $shortDescription ?? 'Deskripsi tidak tersedia.' }}</p>
                                     
                                     <hr class="my-4 border-soft-brown-200">
                                     <div class="flex justify-between items-center mb-4">
@@ -354,7 +350,7 @@
                                             <div class="flex flex-wrap gap-2 min-h-[28px]">
                                                 @if ($menu->toppings->isNotEmpty())
                                                     @foreach ($menu->toppings as $topping)
-                                                        <span class="px-3 py-1 bg-soft-brown-500 text-soft-brown-100 rounded-full text-sm font-medium shadow-sm">
+                                                        <span class="px-3 py-1 bg-soft-brown-500 text-soft-brown-100 rounded-full text-xs font-medium shadow-sm">
                                                             {{ $topping->name }}
                                                         </span>
                                                     @endforeach
@@ -364,7 +360,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
                                 </div>
                             </a> 
                         @endforeach
@@ -377,22 +372,22 @@
     </div>
 
     <footer class="mt-16 text-center text-soft-brown-500 text-sm pb-8">
-        <p>&copy; {{ date('Y') }} Sistem Cafelora. Dibuat dengan Laravel & Filament.</p>
+        <p>&copy; {{ date('Y') }} Sistem {{ config('app.name', 'Restoran') }}. Dibuat dengan Laravel & Filament.</p>
     </footer>
 
+    @if (isset($isSearching) && $isSearching && $firstMenuId)
     <script>
-        @if (isset($isSearching) && $isSearching && $firstMenuId)
-        document.addEventListener('DOMContentLoaded', () => {
-            const targetElement = document.getElementById('menu-{{ $firstMenuId }}');
+        document.addEventListener('DOMContentLoaded', function() {
+            var targetElement = document.getElementById('menu-{{ $firstMenuId }}'); 
             if (targetElement) {
-                const offset = targetElement.offsetTop - 120; 
+                var offset = targetElement.offsetTop - 120;
                 window.scrollTo({
                     top: offset,
                     behavior: 'smooth'
                 });
             }
         });
-        @endif
     </script>
+    @endif
 </body>
 </html>

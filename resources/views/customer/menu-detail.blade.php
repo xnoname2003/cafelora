@@ -100,9 +100,9 @@
                                         {{-- Tampilkan harga jika ada --}}
                                         @if (isset($variant->price) && $variant->price > 0) 
                                             <span class="price-chip">+Rp{{ number_format($variant->price, 0, ',', '.') }}</span>
-                                        @elseif (isset($variant->extra_price) && $variant->extra_price > 0) 
-                                            {{-- Menggunakan variable yang Anda berikan: extra_price --}}
-                                            <span class="price-chip">+Rp{{ number_format($variant->extra_price, 0, ',', '.') }}</span>
+                                        @elseif (isset($variant->price_adjustment) && $variant->price_adjustment > 0) 
+                                            {{-- Menggunakan variable yang Anda berikan: price_adjustment --}}
+                                            <span class="price-chip">+Rp{{ number_format($variant->price_adjustment, 0, ',', '.') }}</span>
                                         @endif
                                     </span>
                                 @empty

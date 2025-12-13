@@ -32,11 +32,13 @@ class Menu extends Model
 
     public function toppings()
     {
-        return $this->belongsToMany(Topping::class, 'menu_topping');
+        return $this->belongsToMany(Topping::class, 'menu_topping')
+        ->orderBy('name');
     }
 
     public function variants()
     {
-        return $this->belongsToMany(Variant::class, 'menu_variant');
+        return $this->belongsToMany(Variant::class, 'menu_variant')
+        ->orderBy('name');
     }
 }

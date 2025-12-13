@@ -12,12 +12,14 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\Action;
 
 class TransactionResource extends Resource
 {
     protected static ?string $model = Transaction::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Menu Transactions';
 
     public static function form(Form $form): Form
     {
@@ -76,11 +78,12 @@ class TransactionResource extends Resource
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->colors([
-                        'warning' => 'pending',
-                        'success' => 'paid',
-                        'danger'  => 'cancelled',
-                    ])
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'paid' => 'success',
+                        'cancelled'  => 'danger',
+                    })
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('total')
@@ -107,12 +110,47 @@ class TransactionResource extends Resource
                         'pending'   => 'Pending',
                         'paid'      => 'Paid',
                         'cancelled' => 'Cancelled',
-                    ]),
+                ]),
+                Tables\Filters\Filter::make('date')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_at')
+                            ->label('Tanggal Transaksi'),
+                ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when(
+                                $data['created_at'],
+                                fn ($query, $date) => $query->whereDate('created_at', $date),
+                            );
+                }),
+                    Tables\Filters\Filter::make('date_range')
+                        ->form([
+                            Forms\Components\DatePicker::make('from')->label('Dari'),
+                            Forms\Components\DatePicker::make('until')->label('Sampai'),
+                        ])
+                        ->query(function ($query, array $data) {
+                            return $query
+                                ->when(
+                                    $data['from'],
+                                    fn ($query, $date) => $query->whereDate('created_at', '>=', $date),
+                                )
+                                ->when(
+                                    $data['until'],
+                                    fn ($query, $date) => $query->whereDate('created_at', '<=', $date),
+                                );
+                        }),
+
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                
+                Action::make('print')
+                    ->label('Print Struk')
+                    ->icon('heroicon-o-printer')
+                    ->url(fn ($record) => route('receipt.show', $record->id))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

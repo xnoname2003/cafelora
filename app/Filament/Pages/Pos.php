@@ -10,7 +10,6 @@ use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Arr;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -25,6 +24,7 @@ class Pos extends Page implements Forms\Contracts\HasForms
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static ?string $title = 'POS Kasir';
     protected static string $view = 'filament.pages.pos';
+    protected static ?string $navigationGroup = 'Menu Transactions';
 
     public function getMaxContentWidth(): MaxWidth
     {
@@ -40,10 +40,10 @@ class Pos extends Page implements Forms\Contracts\HasForms
     // Daftar menu untuk grid
     public $menus = [];
 
-    public array $selectedVariant = [];
-    public array $selectedToppings = [];
-    public array $selectedQty = [];
-
+    public $showCart = false;
+    public $showReceipt = false;
+    public ?Transaction $transaction = null;
+    
     // Filter
     public string $search = '';
     public ?int $selectedCategory = null;
@@ -57,6 +57,9 @@ class Pos extends Page implements Forms\Contracts\HasForms
     protected function queryMenus()
     {
         $query = Menu::with(['category', 'variants', 'toppings']);
+        if ($this->selectedCategory === -1) {
+        return $query->orderByDesc('sales_qty')->take(5);
+        } else
 
         if ($this->selectedCategory) {
             $query->where('category_id', $this->selectedCategory);
@@ -71,13 +74,18 @@ class Pos extends Page implements Forms\Contracts\HasForms
 
     public function loadMenus(): void
     {
-        $this->menus = $this->queryMenus()->orderBy('name')->get();
-        foreach ($this->menus as $menu) {
-        $this->selectedToppings[$menu->id] ??= [];
-        $this->selectedVariant[$menu->id] ??= null;
-        $this->selectedQty[$menu->id] ??= 1;
-    }
-
+        if ($this->selectedCategory === -1) {
+        $this->menus = $this->queryMenus()
+            ->orderByDesc('sales_qty')
+            ->take(5)
+            ->get();
+        }
+        
+        else {$this->menus = $this
+            ->queryMenus()
+            ->orderBy('name')
+            ->get();
+        }
     }
 
     public function updatedSearch(): void
@@ -90,13 +98,6 @@ class Pos extends Page implements Forms\Contracts\HasForms
         $this->loadMenus();
     }
 
-    public function getForms(): array
-    {
-        return [
-            'form' => $this->form(Forms\Form::make($this)),
-        ];
-    }
-
     public function form(Form $form): Form
     {
         return $form
@@ -104,12 +105,16 @@ class Pos extends Page implements Forms\Contracts\HasForms
             ->schema([
                 Repeater::make('items')
                     ->label('Pesanan')
-                    ->columns(6)
+                    ->columns(1)
+                    ->extraAttributes(['class' => 'w-[313px]'])
+                    ->addActionLabel('Tambah Pesanan')
                     ->schema([
                         // Menu
                         Select::make('menu_id')
                             ->label('Menu')
-                            ->options(Menu::pluck('name', 'id'))
+                            ->placeholder('Pilih menu')
+                            ->options(
+                                 Menu::where('stock', '>', 0)->pluck('name', 'id'))
                             ->searchable()
                             ->required()
                             ->reactive()
@@ -118,11 +123,20 @@ class Pos extends Page implements Forms\Contracts\HasForms
                         // Varian
                         Select::make('variant_id')
                             ->label('Varian')
+                            ->placeholder('Pilih varian')
                             ->options(fn ($get) =>
                                 $get('menu_id')
                                     ? Menu::find($get('menu_id'))?->variants->pluck('name', 'id')
                                     : []
                             )
+                            ->reactive()
+                            ->afterStateUpdated(fn ($state, $set, $get) => $this->updatePrices($set, $get)),
+
+                        // Qty
+                        TextInput::make('qty')
+                            ->label('Qty')
+                            ->numeric()
+                            ->default(1)
                             ->reactive()
                             ->afterStateUpdated(fn ($state, $set, $get) => $this->updatePrices($set, $get)),
 
@@ -134,15 +148,7 @@ class Pos extends Page implements Forms\Contracts\HasForms
                                     ? Menu::find($get('menu_id'))?->toppings->pluck('name', 'id')
                                     : []
                             )
-                            ->columns(2)
-                            ->reactive()
-                            ->afterStateUpdated(fn ($state, $set, $get) => $this->updatePrices($set, $get)),
-
-                        // Qty
-                        TextInput::make('qty')
-                            ->label('Qty')
-                            ->numeric()
-                            ->default(1)
+                            ->columns(1)
                             ->reactive()
                             ->afterStateUpdated(fn ($state, $set, $get) => $this->updatePrices($set, $get)),
 
@@ -213,49 +219,25 @@ class Pos extends Page implements Forms\Contracts\HasForms
         $menu = Menu::with(['variants', 'toppings'])->find($menuId);
         if (! $menu) return;
 
-        $qty = max(1, (int) ($this->selectedQty[$menuId] ?? 1));
+        $qty = 1; // default qty
+        $base = (float) $menu->base_price;
 
-        $variantId   = $this->selectedVariant[$menuId] ?? null;
-        $variantName = '-';
-        $adjust      = 0;
-        if ($variantId) {
-            $variant = $menu->variants->firstWhere('id', $variantId);
-            if ($variant) {
-                $variantName = $variant->name;
-                $adjust      = (float) $variant->price_adjustment;
-            }
-        }
-
-        $chosenToppings = Arr::wrap($this->selectedToppings[$menuId] ?? []);
-        $validToppings  = $menu->toppings->whereIn('id', $chosenToppings)->pluck('id')->all();
-        $extra          = (float) $menu->toppings->whereIn('id', $validToppings)->sum('price');
-
-        $base      = (float) $menu->base_price;
-        $unitPrice = $base + $adjust + $extra;
-        $subtotal  = $qty * $unitPrice;
-
-        $items   = $this->data['items'] ?? [];
+        $items = $this->data['items'] ?? [];
         $items[] = [
-            'menu_id'      => $menu->id,
-            'menu_name'    => $menu->name,
-            'variant_id'   => $variantId,
-            'variant_name' => $variantName,
-            'toppings'     => $validToppings,
-            'qty'          => $qty,
-            'base_price'   => $unitPrice,
-            'subtotal'     => $subtotal,
+            'menu_id'    => $menu->id,
+            'menu_name'  => $menu->name,
+            'variant_id' => null,
+            'toppings'   => [],
+            'qty'        => $qty,
+            'base_price' => $base,
+            'subtotal'   => $qty * $base,
         ];
 
         $this->data['items'] = $items;
         $this->form->fill($this->data);
-
-        // reset input per-card
-        $this->selectedQty[$menuId]      = 1;
-        $this->selectedVariant[$menuId]  = null;
-        $this->selectedToppings[$menuId] = [];
     }
 
-    public function submit(): void
+    public function submit()
     {
         $items = collect($this->data['items'] ?? []);
         if ($items->isEmpty()) {
@@ -276,22 +258,20 @@ class Pos extends Page implements Forms\Contracts\HasForms
             'invoice'       => 'INV-' . now()->timestamp,
             'status'        => $status,
             'total'         => $total,
-            'paid_amount'    => $pay,
+            'paid_amount'   => $pay,
             'change_amount' => $change,
         ]);
 
         foreach ($this->data['items'] as $item) {
-            // Simpan item
             $transactionItem = $transaction->items()->create([
                 'menu_id'    => $item['menu_id'],
                 'variant_id' => $item['variant_id'] ?? null,
                 'quantity'   => (int) $item['qty'],
                 'price'      => (int) $item['base_price'],
                 'subtotal'   => (int) $item['subtotal'],
-             ]);
+            ]);
 
-            // Simpan topping per item
-            foreach ($item['toppings'] as $toppingId) {
+                        foreach ($item['toppings'] as $toppingId) {
                 $topping = \App\Models\Topping::find($toppingId);
                 if ($topping) {
                     $transactionItem->toppings()->create([
@@ -302,11 +282,13 @@ class Pos extends Page implements Forms\Contracts\HasForms
                 }
             }
         }
-         // Otomatisasi stok
+
+        // Otomatisasi stok
         foreach ($items as $item) {
             $menu = Menu::find($item['menu_id']);
             if ($menu) {
                 $menu->decrement('stock', $item['qty']);
+                $menu->increment('sales_qty', $item['qty']);
             }
         }
 
@@ -321,10 +303,10 @@ class Pos extends Page implements Forms\Contracts\HasForms
 
         // reset state setelah transaksi
         $this->data = ['items' => [], 'paid_amount' => null];
-        $this->selectedQty = [];
-        $this->selectedVariant = [];
-        $this->selectedToppings = [];
         $this->form->fill($this->data);
         $this->loadMenus();
+
+        $this->transaction = $transaction;
+        $this->dispatch('open-modal', id: 'receipt-preview');
     }
 }

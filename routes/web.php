@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\ReceiptController;
 
 // 1. Rute Utama (index)
 Route::get('/', [MenuController::class, 'indexCustomer'])->name('customer.menu.index');

@@ -25,13 +25,22 @@
     </script>
     <style>
         .price-chip {
-            background-color: #A0522D; /* soft-brown-500 */
-            color: #FAF0E6; /* soft-brown-100 */
+            background-color: #A0522D; 
+            color: #FAF0E6;
             font-weight: bold;
             padding: 2px 8px;
             border-radius: 9999px;
-            font-size: 0.75rem; /* text-xs */
+            font-size: 0.75rem;
             margin-left: 0.5rem;
+        }
+        .image-container-fixed {
+            position: relative;
+            aspect-ratio: 1,5 / 1; 
+        }
+        @media (min-width: 1024px) {
+            .image-container-fixed {
+                aspect-ratio: 16 / 10;
+            }
         }
     </style>
 </head>
@@ -52,19 +61,23 @@
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16">
                 
-                {{-- Bagian Kiri: Gambar --}}
+                {{-- Bagian Kiri: Gambar (Perbaikan Fokus) --}}
                 <div>
-                    @if ($menu->image)
-                    <img 
-                        src="{{ $menu->image }}" 
-                        alt="Gambar {{ $menu->name }}" 
-                        class="w-full h-96 object-cover rounded-xl shadow-lg border-4 border-soft-brown-300"
-                    >
-                    @else
-                    <div class="w-full h-96 flex items-center justify-center rounded-xl shadow-lg border-4 border-soft-brown-300 bg-soft-brown-200 text-soft-brown-700 font-bold text-xl">
-                        Gambar Tidak Tersedia
+                    {{-- Container Baru dengan Rasio Aspek --}}
+                    <div class="image-container-fixed w-full rounded-xl shadow-lg border-4 border-soft-brown-300 overflow-hidden">
+                        @if ($menu->image)
+                        <img 
+                            src="{{ $menu->image }}" 
+                            alt="Gambar {{ $menu->name }}" 
+                            {{-- Hapus h-96, ganti dengan w-full h-full --}}
+                            class="w-full h-full object-cover"
+                        >
+                        @else
+                        <div class="w-full h-full flex items-center justify-center bg-soft-brown-200 text-soft-brown-700 font-bold text-xl">
+                            Gambar Tidak Tersedia
+                        </div>
+                        @endif
                     </div>
-                    @endif
                 </div>
 
                 {{-- Bagian Kanan: Detail --}}

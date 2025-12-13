@@ -8,7 +8,6 @@ use App\Models\Category;
 
 class MenuController extends Controller
 {
-    // === METHOD 1: indexCustomer (Menampilkan Daftar Menu dan Filter Form) ===
     public function indexCustomer(Request $request)
     {
         $searchQuery = $request->input('search');
@@ -19,11 +18,20 @@ class MenuController extends Controller
         $isSearching = $searchQuery || $minPrice || $maxPrice || $categoryName;
         
         $allCategories = Category::orderBy('name')->get();
+        
+       
+        $bestsellers = Menu::with(['variants', 'toppings', 'category'])
+                            ->orderBy('sales_qty', 'desc')
+                            ->take(4)
+                            ->get();
+
 
         if ($isSearching) {
             
             $query = Menu::query();
 
+            // ... (Logika filtering Anda tetap sama)
+            
             if ($searchQuery) {
                 $query->where('name', 'LIKE', '%' . $searchQuery . '%'); 
             }
@@ -55,6 +63,7 @@ class MenuController extends Controller
                 'categories' => collect(), 
                 'allCategories' => $allCategories, 
                 'firstMenuId' => $firstMenuId,
+                'bestsellers' => $bestsellers, 
             ]);
 
         } else {
@@ -73,11 +82,11 @@ class MenuController extends Controller
                 'filteredMenus' => collect(), 
                 'allCategories' => $allCategories,
                 'firstMenuId' => null,
+                'bestsellers' => $bestsellers,
             ]);
         }
     }
 
-    // === METHOD 2: showCustomer (Untuk menampilkan Halaman Detail Menu) ===
     public function showCustomer(Menu $menu)
     {
         $menu->load(['category', 'variants', 'toppings']);
@@ -87,7 +96,6 @@ class MenuController extends Controller
         ]);
     }
     
-    // === METHOD 3: showByCategory (Untuk Tautan Kategori dari menu utama) ===
     public function showByCategory($name)
     {
         $category = Category::where('name', $name)->firstOrFail();
@@ -107,6 +115,7 @@ class MenuController extends Controller
             'categories' => collect(), 
             'allCategories' => $allCategories, 
             'firstMenuId' => $firstMenuId,
+            'bestsellers' => collect(), 
         ]);
     }
 }

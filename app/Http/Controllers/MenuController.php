@@ -18,12 +18,20 @@ class MenuController extends Controller
         $isSearching = $searchQuery || $minPrice || $maxPrice || $categoryName;
         
         $allCategories = Category::orderBy('name')->get();
+        
+       
+        $bestsellers = Menu::with(['variants', 'toppings', 'category'])
+                            ->orderBy('sales_qty', 'desc')
+                            ->take(4)
+                            ->get();
 
 
         if ($isSearching) {
             
             $query = Menu::query();
 
+            // ... (Logika filtering Anda tetap sama)
+            
             if ($searchQuery) {
                 $query->where('name', 'LIKE', '%' . $searchQuery . '%'); 
             }
@@ -45,22 +53,25 @@ class MenuController extends Controller
             }
             
             $filteredMenus = $query->with(['variants', 'toppings', 'category'])->get();
+            
+            $firstMenuId = $filteredMenus->isNotEmpty() ? $filteredMenus->first()->id : null;
+
 
             return view('customer.menu', [
                 'filteredMenus' => $filteredMenus,
                 'isSearching' => true,
                 'categories' => collect(), 
                 'allCategories' => $allCategories, 
+                'firstMenuId' => $firstMenuId,
+                'bestsellers' => $bestsellers, 
             ]);
 
         } else {
             
             $categories = Category::with([
                 'menus' => function ($query) {
-                    $query->orderBy('sales_qty', 'desc');
-                },
-                'menus.variants',
-                'menus.toppings'
+                    $query->orderBy('sales_qty', 'desc')->with(['variants', 'toppings']);
+                }
             ])
             ->orderBy('name')
             ->get();
@@ -69,8 +80,42 @@ class MenuController extends Controller
                 'categories' => $categories,
                 'isSearching' => false,
                 'filteredMenus' => collect(), 
-                'allCategories' => $allCategories, 
+                'allCategories' => $allCategories,
+                'firstMenuId' => null,
+                'bestsellers' => $bestsellers,
             ]);
         }
+    }
+
+    public function showCustomer(Menu $menu)
+    {
+        $menu->load(['category', 'variants', 'toppings']);
+
+        return view('customer.menu-detail', [
+            'menu' => $menu,
+        ]);
+    }
+    
+    public function showByCategory($name)
+    {
+        $category = Category::where('name', $name)->firstOrFail();
+        
+        $menus = Menu::where('category_id', $category->id)
+                      ->with(['variants', 'toppings', 'category'])
+                      ->orderBy('sales_qty', 'desc')
+                      ->get();
+                      
+        $allCategories = Category::orderBy('name')->get();
+        
+        $firstMenuId = $menus->isNotEmpty() ? $menus->first()->id : null;
+        
+        return view('customer.menu', [
+            'filteredMenus' => $menus,
+            'isSearching' => true, 
+            'categories' => collect(), 
+            'allCategories' => $allCategories, 
+            'firstMenuId' => $firstMenuId,
+            'bestsellers' => collect(), 
+        ]);
     }
 }

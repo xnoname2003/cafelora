@@ -55,7 +55,9 @@ class MenuResource extends Resource
                 ->visibility('public')
                 ->maxSize(2048)
                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                ->image(),
+                ->image()
+                ->dehydrated(fn ($state) => filled($state))
+                ->nullable(),
 
             Forms\Components\TextInput::make('stock')
                 ->label('Stok')

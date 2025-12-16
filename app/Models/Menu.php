@@ -20,6 +20,11 @@ class Menu extends Model
         'sales_qty',
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'name';
+    }
+    
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -27,11 +32,13 @@ class Menu extends Model
 
     public function toppings()
     {
-        return $this->belongsToMany(Topping::class, 'menu_topping');
+        return $this->belongsToMany(Topping::class, 'menu_topping')
+        ->orderBy('name');
     }
 
     public function variants()
     {
-        return $this->belongsToMany(Variant::class, 'menu_variant');
+        return $this->belongsToMany(Variant::class, 'menu_variant')
+        ->orderBy('name');
     }
 }

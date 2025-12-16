@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Pages\DetailOrder;
 use App\Models\Menu;
 use App\Models\Category;
 use App\Models\Transaction;
@@ -16,6 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Placeholder;
+use Illuminate\Support\Str;
 
 class Pos extends Page implements Forms\Contracts\HasForms
 {
@@ -130,6 +132,7 @@ class Pos extends Page implements Forms\Contracts\HasForms
                                     : []
                             )
                             ->reactive()
+                            ->required(fn ($get) => Menu::find($get('menu_id'))?->variants->count() > 0)
                             ->afterStateUpdated(fn ($state, $set, $get) => $this->updatePrices($set, $get)),
 
                         // Qty
@@ -138,6 +141,7 @@ class Pos extends Page implements Forms\Contracts\HasForms
                             ->numeric()
                             ->default(1)
                             ->reactive()
+                            ->required()
                             ->afterStateUpdated(fn ($state, $set, $get) => $this->updatePrices($set, $get)),
 
                         // Topping
@@ -172,23 +176,6 @@ class Pos extends Page implements Forms\Contracts\HasForms
                     ->content(fn ($get) =>
                         'Rp ' . number_format((float) collect($get('items') ?? [])->sum('subtotal'), 0, ',', '.')
                     )
-                    ->live(),
-
-                // Pembayaran
-                TextInput::make('paid_amount')
-                    ->label('Pembayaran')
-                    ->numeric()
-                    ->reactive()
-                    ->live(),
-
-                // Kembalian real-time
-                Placeholder::make('change_amount')
-                    ->label('Kembalian')
-                    ->content(function ($get) {
-                        $total = (float) collect($get('items') ?? [])->sum('subtotal');
-                        $pay   = (float) ($get('paid_amount') ?? 0);
-                        return 'Rp ' . number_format(max(0, $pay - $total), 0, ',', '.');
-                    })
                     ->live(),
             ]);
     }
@@ -253,9 +240,15 @@ class Pos extends Page implements Forms\Contracts\HasForms
         $change = max(0, $pay - $total);
         $status = $pay >= $total ? 'paid' : 'pending';
 
+        // Hitung nomor antrian (reset setiap hari)
+        $today = now()->startOfDay();
+        $lastQueue = Transaction::where('created_at', '>=', $today)->max('queue_number');
+        $queueNumber = $lastQueue ? $lastQueue + 1 : 1;
+
         $transaction = Transaction::create([
             'user_id'       => Auth::id(),
-            'invoice'       => 'INV-' . now()->timestamp,
+            'invoice'       => 'INV-'.now()->format('YmdHis').'-'.Str::upper(Str::random(4)),
+            'queue_number'  => $queueNumber,
             'status'        => $status,
             'total'         => $total,
             'paid_amount'   => $pay,
@@ -265,7 +258,7 @@ class Pos extends Page implements Forms\Contracts\HasForms
         foreach ($this->data['items'] as $item) {
             $transactionItem = $transaction->items()->create([
                 'menu_id'    => $item['menu_id'],
-                'variant_id' => $item['variant_id'] ?? null,
+                'variant_id' => empty($item['variant_id']) ? null : $item['variant_id'],
                 'quantity'   => (int) $item['qty'],
                 'price'      => (int) $item['base_price'],
                 'subtotal'   => (int) $item['subtotal'],
@@ -293,10 +286,10 @@ class Pos extends Page implements Forms\Contracts\HasForms
         }
 
         Notification::make()
-            ->title('Transaksi Berhasil')
+            ->title('Pesanan Berhasil Dibuat')
             ->body(
                 'Total: Rp ' . number_format($total, 0, ',', '.') .
-                ' | Kembalian: Rp ' . number_format($change, 0, ',', '.')
+                ($status === 'paid' ? ' (Lunas)' : ' (Belum Lunas)')
             )
             ->success()
             ->send();
@@ -306,7 +299,6 @@ class Pos extends Page implements Forms\Contracts\HasForms
         $this->form->fill($this->data);
         $this->loadMenus();
 
-        $this->transaction = $transaction;
-        $this->dispatch('open-modal', id: 'receipt-preview');
+        return redirect()->to(DetailOrder::getUrl(['invoice' => $transaction->invoice]));
     }
 }

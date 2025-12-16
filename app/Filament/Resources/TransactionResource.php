@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Actions\Action;
+use App\Filament\Pages\DetailOrder;
 
 class TransactionResource extends Resource
 {
@@ -41,6 +42,7 @@ class TransactionResource extends Resource
                     ->options([
                         'pending'   => 'Pending',
                         'paid'      => 'Paid',
+                        'completed' => 'Completed',
                         'cancelled' => 'Cancelled',
                     ])
                     ->required(),
@@ -82,6 +84,7 @@ class TransactionResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
                         'paid' => 'success',
+                        'completed' => 'success',
                         'cancelled'  => 'danger',
                     })
                     ->sortable(),
@@ -109,6 +112,7 @@ class TransactionResource extends Resource
                     ->options([
                         'pending'   => 'Pending',
                         'paid'      => 'Paid',
+                        'completed' => 'Completed',
                         'cancelled' => 'Cancelled',
                 ]),
                 Tables\Filters\Filter::make('date')
@@ -142,14 +146,15 @@ class TransactionResource extends Resource
 
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->url(fn (Transaction $record) => DetailOrder::getUrl(['invoice' => $record->invoice])),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 
                 Action::make('print')
                     ->label('Print Struk')
                     ->icon('heroicon-o-printer')
-                    ->url(fn ($record) => route('receipt.show', $record->id))
+                    ->url(fn ($record) => route('receipt.show', $record))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
@@ -172,7 +177,6 @@ class TransactionResource extends Resource
         return [
             'index' => Pages\ListTransactions::route('/'),
             'edit' => Pages\EditTransaction::route('/{record}/edit'),
-            'view' => Pages\ViewTransaction::route('/{record}'),
         ];
     }
 }

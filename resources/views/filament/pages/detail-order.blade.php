@@ -9,7 +9,7 @@
                 <p><span class="font-medium">Nomor Invoice:</span> {{ $transaction->invoice }}</p>
                 <p><span class="font-medium">Nomor Antrian:</span> <span
                         class="text-lg font-bold">#{{ $transaction->queue_number }}</span></p>
-                <p><span class="font-medium">Nama Pelanggan:</span> {{ $transaction->user->name ?? 'Guest' }}</p>
+                <p><span class="font-medium">Nama Casier:</span> {{ $transaction->user->name ?? 'Guest' }}</p>
                 <p><span class="font-medium">Metode Pembayaran:</span>
                     {{ ucfirst($transaction->payments->last()?->payment_method ?? '-') }}</p>
                 <div class="flex items-center gap-2">

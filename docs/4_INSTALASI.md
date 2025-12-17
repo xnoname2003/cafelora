@@ -1,33 +1,47 @@
 ---
 # Teknologi yang Digunakan
 
-Aplikasi ini dibangun menggunakan beberapa teknologi utama yang mendukung backend, forntend, dan database, sehingga aplikasi dapat berjalan dengan baik dan terstruktur. Berikut teknologi yang digunakan:
+Aplikasi Cafelora dibangun menggunakan kombinasi teknologi backend, forntend, dan database yang saling terintegrasi untuk mendukung proses operasional kafe secara optimal. Pemilihan teknologi ini didasarkan pada kebutuhan pengembangan aplikasi yang terstruktur, mudah dikembangkan, serta sesuai dengan praktik pembuatan aplikasi web modern.
 
-| Teknologi          | Versi  | Keterangan                                                                      | 
-|--------------------|--------|---------------------------------------------------------------------------------|
-| PHP                | ^8.2   | Bahasa pemrograman server-side yang menjalankan logika aplikasi.                |
-| Laravel Framework  | ^12.0  | Framework PHP berbasis MVC untuk mengatur routing, controller, model, dan view. | 
-| Composer           | Latest | Dependency manager untuk mengelola library dan package PHP.                     | 
-| NPM                | Latest | Package manager untuk mengelola library dan modul JavaScript.                   |
-| Vite               | Latest | Build tool untuk mengompilasi dan mengelola file frontend.                      | 
-| MySQL/PostgreSQL   | Latest | Database relasional untuk menyimpan semua data aplikasi.                        | 
-| Filament           | ^3.3   | Admin panel Laravel untuk membuat CRUD cepat, form, tabel, dan manajemen data.  |
+| Teknologi         | Versi  | Keterangan                                                                                                                              | 
+|-------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| PHP               | ^8.2   | Bahasa pemrograman server-side yang digunakan untuk menangani logika bisnis, proses transaksi, dan pengelolaan data aplikasi.           |
+| Laravel Framework | ^12.0  | Framework PHP berbasis MVC yang digunakan untuk mengatur alur aplikasi, mulai dari routing, controller, model, hingga view secara terstruktur. | 
+| Composer          | Latest | Dependency manager PHP yang digunakan untuk mengelola library dan package yang dibutuhkan oleh Laravel.                                 | 
+| NPM               | Latest | Package manager JavaScript yang digunakan untuk mengelola dependency frontend.                                                          |
+| Vite              | Latest | Build tool frontend yang digunakan untuk mengelola dan mengompilasi aset frontend agar lebih cepat dan optimal.                         | 
+| MySQL/PostgreSQL  | Latest | Database relasional yang digunakan untuk menyimpan data aplikasi seperti menu, transaksi, pengguna, dan laporan penjualan.              | 
+| Filament          | ^3.3   | Admin panel Laravel yang digunakan untuk mempercepat pembuatan fitur CRUD, form, tabel, serta manajemen data pada sisi admin dan kasir. |
 
 ---
 # Persyaratan Sistem
 
-Sebelum menjalankan aplikasi, pastikan perangkat sudah memenuhi persyaratan berikut:
+Sebelum menjalankan aplikasi Cafelora, perangkat yang digunakan harus memenuhi beberapa persyaratan sistem agar aplikasi dapat berjalan dengan baik dan stabil.
 
-1. *PHP >= 8.2*            : Versi PHP yang kompatibel dengan Laravel 12.
-2. *Composer*              : Untuk mengelola dependency PHP.
-3. *Node.js & NPM*         : Untuk menjalankan script frontend dan build assets.
-4. *MySQL atau PostgreSQL* : Database untuk menyimpan data aplikasi.
-5. *Web Server*            : Seperti Apache atau Nginx, atau bisa menggunakan Laravel built-in server.
+## 1. PHP >= 8.2
 
-Untuk pengguna Windows, disarankan menggunakan salah satu dari:
-1. *Laragon* : Sudah termasuk PHP, MySQL, dan Apache, memudahkan setup lingkungan development.
-2. *XAMPP*   : Paket server populer untuk PHP dan MySQL.
-3. *Herd*    : Alternatif ringan untuk development lokal.
+Digunakan sebagai runtime utama aplikasi Laravel. Versi ini dipilih karena kompatibel dengan Laravel 12 dan mendukung fitur bahasa terbaru.
+
+## 2. Composer
+
+Digunakan untuk mengelola dependency PHP yang dibutuhkan oleh framework Laravel dan library pendukung lainnya.
+
+## 3. Node.js & NPM     
+
+Digunakan untuk menjalankan proses instalasi dependency frontend serta membangun aset frontend menggunakan Vite.
+
+## 4. MySQL atau PostgreSQL
+
+Digunakan sebagai sistem manajemen basis data untuk menyimpan seluruh data aplikasi.
+
+## 5. Web Server           
+
+Aplikasi dapat dijalankan menggunakan web server seperti Apache atau Nginx, maupun menggunakan Laravel built-in server untuk kebutuhan development.
+
+Untuk pengguna sistem operasi Windows, disarankan menggunakan salah satu tools beriktu:
+1. *Laragon*, karena menyediakan PHP, MySQL, dan Apache dalam satu paket sehingga memudahkan proses setup.
+2. *XAMPP*, sebagai alternatif server lokal yang umum digunakan.
+3. *Herd*, sebagai alternatif yang lebih ringan untuk pengembangan Laravel secara lokal.
 
 ---
 # Langkah Instalasi
@@ -40,7 +54,7 @@ https://github.com/xnoname2003/cafelora.git
 cd cafelora
 ```
 
-Langkah ini digunakan untuk mengambil kode sumber aplikasi dari repository Git. Jika menggunakan Git, perintah git clone akan menyalin seluruh project ke komputer kita, kemudian cd cafelora masuk ke folder proyek agar siap untuk langkah selanjutnya.
+Langkah ini bertujuan untuk memperoleh kode sumber aplikasi Cafelora. Repository dapat di-clone menggunakan Git atau diunduh secara manual. Setelah proses selesai, pengguna masuk ke direktori proyek untuk melanjutkan ke tahap instalasi berikutnya.
 
 ## 2. Install Dependencies PHP
 
@@ -48,7 +62,7 @@ Langkah ini digunakan untuk mengambil kode sumber aplikasi dari repository Git. 
 composer install
 ```
 
-Perintah ini digunakan untuk menginstal *library dan package PHP* yang dibutuhkan oleh Laravel. Semua dependensi sudah didefinisikan di file composer.json, sehingga aplikasi bisa berjalan dengan baik.
+Perintah ini digunakan untuk menginstal seluruh dependency PHP yang dibutuhkan oleh aplikasi Laravel. Dependency tersebut didefinisikan dalam file `composer.json` dan diperlukan agar aplikasi dapat berjalan sesuai dengan konfigurasi yang telah ditentukan.
 
 ## 3. Install Dependencies JavaScript
 
@@ -56,7 +70,7 @@ Perintah ini digunakan untuk menginstal *library dan package PHP* yang dibutuhka
 npm install
 ```
 
-Laravel menggunakan JavaScript untuk frontend (misal interaksi UI atau build assets). Perintah ini akan menginstal semua package JavaScript yang diperlukan sesuai definisi di package.json.
+Perintah ini digunakan untuk menginstal seluruh dependency JavaScript yang dibutuhkan untuk pengelolaan frontend aplikasi. Dependency ini mencakup library pendukung antarmuka dan proses build aset frontend menggunakan Vite.
 
 ## 4. Konfigurasi Environment
 
@@ -68,12 +82,13 @@ copy .env.example .env
 php artisan key:generate
 ```
 
-1. copy .env.example .env   : Membuat salinan file konfigurasi environment agar bisa diubah sesuai pengaturan lokal.
-2. php artisan key:generate : Membuat *aplication key* yang digunakan Laravel untuk keamanan, misalnya enkripsi session dan data sensitif.
+Langkah ini dilakukan untuk menyiapkan file konfigurasi environment aplikasi:
+1. File `.env` digunakan untuk menyimpan konfigurasi penting seperti koneksi database dan pengaturan aplikasi.
+2. Perintah `php artisan key:generate` digunakan untuk membuat *application key* yang berfungsi menjaga keamanan data, seperti enkripsi session dan informasi sensitif lainnya.
 
 ## 5. Konfigurasi Database
 
-Edit file .env untuk menyesuaikan pengaturan database:
+Pengguna perlu menyesuaikan konfigurasi database pada file `.env` agar aplikasi dapat terhubung dengan database lokal.
 
 ```env
 DB_CONNECTION=mysql
@@ -84,7 +99,7 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Di sini kita menentukan tipe database (MySQL), alamat server database, nama database, username, dan password. Ini agar Laravel bisa terhubung ke database lokal.
+Pengaturan ini meliputi jenis database, alamat server, port, nama database, serta kredensial yang digunakan. Pastikan database dengan nama yang sesuai sudah dibuat sebelumnya.
 
 ## 6. Jalankan Migration & Seeder
 
@@ -96,8 +111,8 @@ php artisan migrate
 php artisan db:seed
 ```
 
-1. php artisan migrate : Membuat semua *tabel di database* sesuai file migration.
-2. php artisan db:seed : Opsional, untuk mengisi database dengan *data dummy* agar bisa langsung dicoba tanpa menambahkan data manual.
+1. `php artisan migrate` digunakan untuk membuat seluruh tabel database berdasarkan file migration.
+2. `php artisan db:seed` bersifat opsional dan digunakan untuk mengisi database dengan data awal (dummy) agar aplikasi dapat langsung diuji tanpa memasukkan data secara manual.
 
 ## 7. Build Assets Frontend
 
@@ -109,8 +124,8 @@ npm run dev
 npm run build
 ```
 
-1. npm run dev   : Membangun aset frontend untuk *development*, termasuk hot reload agar perubahan langsung terlihat di browser.
-2. npm run build : Membangun aset frontend untuk *production*, biasanya lebih optimal dan sudah terminify.
+1. `npm run dev` digunakan pada tahap pengembangan karena mendukung *hot reload* sehingga perubahan kode frontend dapat langsung terlihat.
+2. `npm run build` digunakan untuk membangun aset frontend versi production yang lebih optimal.
 
 ## 8. Jalankan Aplikasi
 
@@ -119,6 +134,8 @@ npm run build
 php artisan serve
 ```
 
-Perintah ini menjalankan *Laravel built-in server* sehingga aplikasi bisa diakses melalui browser. Default URL: http://127.0.0.1:8000.
+Perintah ini digunakan untuk menjalankan *Laravel built-in server*. Setelah server berjalan, aplikasi dapat diakses melalui browser pada alamat:
+
+`http://127.0.0.1:8000`
 
 ---

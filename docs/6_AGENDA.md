@@ -75,7 +75,7 @@ Pengembangan dimulai pada *26 November 2025* dan berlangsung secara bertahap hin
 ### 3. Aditya Nur Lintang
 
 | No. | Fitur                    | Deskripsi Uji                                    | Status     | Tanggal Mulai    |
-|-----|--------------------------|----------------------------------------- --------|------------|------------------|
+|-----|--------------------------|--------------------------------------------------|------------|------------------|
 | 1   | Setup Laravel & Filament | Proyek berhasil dijalankan dan panel admin siap  | ✅ Selesai | 26 November 2025 |
 | 2   | Role & Policy            | Hak akses Admin dan Staf terdefinisi dengan baik | ✅ Selesai | 26 November 2025 |
 | 3   | Manajemen User           | CRUD user berjalan tanpa error                   | ✅ Selesai | 26 November 2025 |

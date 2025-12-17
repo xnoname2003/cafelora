@@ -47,7 +47,7 @@ Pelanggan merupakan pengguna sistem pada sisi frontend. Pelanggan dapat mengakse
 ---
 # Fitur Aplikasi Cafelora
 
-## 1. Fitur Admin
+## Fitur Admin
 
 ### 1. CRUD Menu, Kategori, Varian, dan Topping
 
@@ -77,7 +77,8 @@ Dashboard menyajikan ringkasan pendapatan dan grafik penjualan dalam periode ter
 
 Admin dapat mengekspor laporan transaksi ke dalam format PDF atau Excel untuk keperluan dokumentasi, evaluasi, maupun pelaporan.
 
-## 2. Fitur Kasir/Staf (POS)
+---
+## Fitur Kasir/Staf (POS)
 
 ### 1. Input Pesanan menggunakan Komponen Repeater
 
@@ -103,7 +104,8 @@ Setelah transaksi selesai, sistem menyediakan struk dalam format PDF atau HTML y
 
 Kasir hanya dapat mengakses fitur yang berkaitan dengan transaksi, sehingga keamanan dan fokus kerja tetap terjaga.
 
-## 3. Fitur Pelanggan (Frontend)
+---
+## Fitur Pelanggan (Frontend)
 
 ### 1. Melihat Daftar Menu Makanan dan Minuman
 
@@ -121,7 +123,8 @@ Menu ditampilkan dalam bentuk kartu untuk memudahkan pelanggan dalam melihat dan
 
 Halaman ini menyajikan informasi lebih lengkap mengenai menu, seperti deskripsi dan detail tambahan yang relevan.
 
-## 4. Fitur Tambahan (Opsional)
+---
+## Fitur Tambahan (Opsional)
 
 ### 1. Integrasi Payment Gateway (Midtrans atau Xendit)
 

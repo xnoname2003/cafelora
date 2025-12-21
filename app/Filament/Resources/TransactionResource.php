@@ -148,14 +148,26 @@ class TransactionResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->url(fn (Transaction $record) => DetailOrder::getUrl(['invoice' => $record->invoice])),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+
+                Action::make('complete')
+                    ->label('Selesaikan')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (Transaction $record) => "Selesaikan Pesanan {$record->invoice}?")
+                    ->action(function (Transaction $record) {
+                        $record->update(['status' => 'completed']);
+                    })
+                    ->visible(fn (Transaction $record): bool => $record->status === 'paid'),
                 
                 Action::make('print')
                     ->label('Print Struk')
                     ->icon('heroicon-o-printer')
                     ->url(fn ($record) => route('receipt.show', $record))
                     ->openUrlInNewTab(),
+
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

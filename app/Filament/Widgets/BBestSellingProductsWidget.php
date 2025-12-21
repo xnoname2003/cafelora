@@ -22,7 +22,7 @@ class BBestSellingProductsWidget extends BaseWidget
                 Menu::query()
                     ->join('transaction_items', 'menus.id', '=', 'transaction_items.menu_id')
                     ->select(
-                        'menus.id', // <-- Tambahkan ini agar primary key terbaca
+                        'menus.id',
                         'menus.name',
                         'menus.stock',
                         DB::raw('SUM(transaction_items.quantity) as total_quantity')
@@ -41,8 +41,8 @@ class BBestSellingProductsWidget extends BaseWidget
                     ->label('Stok Tersedia')
                     ->numeric(),
             ])
-            ->paginated(false) // Nonaktifkan paginasi
-            ->searchable(false); // Nonaktifkan pencarian
+            ->paginated(false)
+            ->searchable(false);
 
             
     }

@@ -14,21 +14,15 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     use HasFactory, Notifiable, HasRoles;
 
-    /**
-     * Mass assignable fields
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
     ];
 
-    /**
-     * Filament: User can access panel?
-     */
     public function canAccessPanel(\Filament\Panel $panel): bool
     {
-        return true; // nanti bisa diubah: $this->hasRole('admin')
+        return true;
     }
 
     /**

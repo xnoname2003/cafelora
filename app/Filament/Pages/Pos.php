@@ -33,20 +33,17 @@ class Pos extends Page implements Forms\Contracts\HasForms
         return MaxWidth::Full;
     }
 
-    // State form
     public ?array $data = [
         'items' => [],
         'paid_amount' => null,
     ];
 
-    // Daftar menu untuk grid
     public $menus = [];
 
     public $showCart = false;
     public $showReceipt = false;
     public ?Transaction $transaction = null;
     
-    // Filter
     public string $search = '';
     public ?int $selectedCategory = null;
 
@@ -89,14 +86,12 @@ class Pos extends Page implements Forms\Contracts\HasForms
             ->get();
         }
 
-        // Logika baru untuk menyesuaikan stok yang ditampilkan berdasarkan item di keranjang
         $cartQuantities = collect($this->data['items'] ?? [])
             ->groupBy('menu_id')
             ->map(fn ($items) => $items->sum(fn ($item) => (int) ($item['qty'] ?? 0)));
 
         $this->menus->each(function ($menu) use ($cartQuantities) {
             if ($cartQuantities->has($menu->id)) {
-                // Kurangi stok menu dengan kuantitas yang ada di keranjang
                 $menu->stock = max(0, $menu->stock - $cartQuantities->get($menu->id));
             }
         });
@@ -160,7 +155,6 @@ class Pos extends Page implements Forms\Contracts\HasForms
                             ->rules([
                                 function (callable $get) {
                                     return function (string $attribute, $value, \Closure $fail) use ($get) {
-                                        // Dapatkan path dan key dari item yang sedang diedit
                                         $itemPath = Str::beforeLast($attribute, '.');
                                         $itemKey = Str::afterLast($itemPath, '.');
 
@@ -176,10 +170,8 @@ class Pos extends Page implements Forms\Contracts\HasForms
 
                                         $originalStock = $menu->stock;
 
-                                        // Ambil semua item dari keranjang
                                         $allItems = $get('..');
 
-                                        // Hitung total kuantitas untuk menu yang sama di item LAIN dalam keranjang
                                         $otherItemsQty = 0;
                                         if (is_array($allItems)) {
                                             foreach ($allItems as $key => $item) {
@@ -261,7 +253,7 @@ class Pos extends Page implements Forms\Contracts\HasForms
         $menu = Menu::with(['variants', 'toppings'])->find($menuId);
         if (! $menu) return;
 
-        $qty = 1; // default qty
+        $qty = 1;
         $base = (float) $menu->base_price;
 
         $items = $this->data['items'] ?? [];
@@ -282,13 +274,8 @@ class Pos extends Page implements Forms\Contracts\HasForms
 
     public function submit()
     {
-        // 1. Panggil validasi form secara eksplisit.
-        // Ini akan menjalankan semua aturan, termasuk validasi stok live yang sudah kita buat.
-        // Jika ada error, proses akan berhenti di sini dan menampilkan pesan di bawah input yang salah.
         $this->form->validate();
 
-        // 2. Sebagai pengaman tambahan (best practice), kita lakukan validasi akhir yang komprehensif
-        // terhadap keseluruhan keranjang sebelum membuat transaksi. Ini mencegah race condition.
         $items = collect($this->data['items'] ?? []);
         $menuQuantities = $items->groupBy('menu_id')->map(fn ($group) => $group->sum('qty'));
 
@@ -301,7 +288,7 @@ class Pos extends Page implements Forms\Contracts\HasForms
                     ->danger()
                     ->send();
 
-                return; // Hentikan proses checkout
+                return;
             }
         }
 
@@ -319,7 +306,6 @@ class Pos extends Page implements Forms\Contracts\HasForms
         $change = max(0, $pay - $total);
         $status = $pay >= $total ? 'paid' : 'pending';
 
-        // Hitung nomor antrian (reset setiap hari)
         $today = now()->startOfDay();
         $lastQueue = Transaction::where('created_at', '>=', $today)->max('queue_number');
         $queueNumber = $lastQueue ? $lastQueue + 1 : 1;
@@ -355,7 +341,6 @@ class Pos extends Page implements Forms\Contracts\HasForms
             }
         }
 
-        // Otomatisasi stok
         foreach ($items as $item) {
             $menu = Menu::find($item['menu_id']);
             if ($menu) {
@@ -372,8 +357,7 @@ class Pos extends Page implements Forms\Contracts\HasForms
             )
             ->success()
             ->send();
-
-        // reset state setelah transaksi
+            
         $this->data = ['items' => [], 'paid_amount' => null];
         $this->form->fill($this->data);
         $this->loadMenus();

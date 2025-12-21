@@ -43,10 +43,7 @@ class Transaction extends Model
         'change_amount',
         'queue_number',
     ];
-
-    /**
-     * Get the route key for the model.
-     */
+    
     public function getRouteKeyName(): string
     {
         return 'invoice';

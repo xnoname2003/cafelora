@@ -15,7 +15,6 @@ class CSalesChart extends ChartWidget
 {
     protected static ?string $heading = 'Grafik Penjualan';
 
-    // Menambahkan filter di pojok kanan atas chart
     public ?string $filter = 'today';
 
     protected function getFilters(): ?array
@@ -45,7 +44,6 @@ class CSalesChart extends ChartWidget
                     ->pluck('total', 'hour')
                     ->all();
 
-                // Inisialisasi data untuk 24 jam dengan nilai 0
                 for ($i = 0; $i < 24; $i++) {
                     $labels[] = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00';
                     $data[] = $salesData[$i] ?? 0;
@@ -66,7 +64,6 @@ class CSalesChart extends ChartWidget
                     ->get()
                     ->keyBy('date');
 
-                // Inisialisasi data untuk 7 hari dengan nilai 0
                 for ($date = $startDate->copy(); $date <= $endDate; $date->addDay()) {
                     $formattedDate = $date->format('Y-m-d');
                     $labels[] = $date->format('d M');
@@ -121,8 +118,6 @@ class CSalesChart extends ChartWidget
         return 'line';
     }
 
-    // protected static ?string $heading = 'Produk Terlaris';
-
     public function table(Table $table): Table
     {
         return $table
@@ -130,7 +125,7 @@ class CSalesChart extends ChartWidget
                 Menu::query()
                     ->join('transaction_items', 'menus.id', '=', 'transaction_items.menu_id')
                     ->select(
-                        'menus.id', // <-- Tambahkan ini agar primary key terbaca
+                        'menus.id',
                         'menus.name',
                         DB::raw('SUM(transaction_items.quantity) as total_quantity')
                     )
@@ -145,8 +140,8 @@ class CSalesChart extends ChartWidget
                     ->label('Jumlah Terjual')
                     ->numeric(),
             ])
-            ->paginated(false) // Nonaktifkan paginasi
-            ->searchable(false); // Nonaktifkan pencarian
+            ->paginated(false)
+            ->searchable(false);
 
             
     }

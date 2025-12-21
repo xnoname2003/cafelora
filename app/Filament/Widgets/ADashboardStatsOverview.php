@@ -13,21 +13,16 @@ class ADashboardStatsOverview extends BaseWidget
 {
     protected function getStats(): array
     {
-        // 1. Total Penjualan Harian
         $dailyRevenue = Transaction::whereDate('created_at', Carbon::today())->sum('total');
 
-        // 2. Total Penjualan Bulanan
         $monthlyRevenue = Transaction::whereYear('created_at', Carbon::now()->year)
             ->whereMonth('created_at', Carbon::now()->month)
             ->sum('total');
 
-        // 3. Total Penjualan Tahunan
         $yearlyRevenue = Transaction::whereYear('created_at', Carbon::now()->year)->sum('total');
 
-        // 4. Total Penjualan Keseluruhan
         $totalRevenue = Transaction::sum('total');
 
-        // Helper untuk memformat angka sesuai permintaan (misal: 1.363.000 -> Rp 1.363K)
         $formatRevenue = function (float|int $number): string {
             if ($number < 1000) {
                 return Number::currency($number, 'IDR');

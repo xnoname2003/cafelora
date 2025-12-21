@@ -13,7 +13,7 @@ class ListTransactions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            // Actions\CreateAction::make(), // disable create new transaction from filament
+            //
         ];
     }
 }

@@ -21,10 +21,8 @@ class DetailOrder extends Page implements HasForms
 
     protected static string $view = 'filament.pages.detail-order';
 
-    // Slug dengan parameter dinamis agar URL menjadi /admin/pos/order/{invoice}
     protected static ?string $slug = 'pos/order/{invoice}';
 
-    // Sembunyikan dari sidebar navigasi karena halaman ini diakses via redirect/link
     protected static bool $shouldRegisterNavigation = false;
 
     public ?Transaction $transaction = null;
@@ -203,7 +201,7 @@ class DetailOrder extends Page implements HasForms
 
             $transaction_details = array(
                 'order_id' => $transaction->invoice,
-                'gross_amount' => $transaction->total, // no decimal allowed for creditcard
+                'gross_amount' => $transaction->total,
             );
 
             $casier_details = array(

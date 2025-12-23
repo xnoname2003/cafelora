@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Actions\Action;
 use App\Filament\Pages\DetailOrder;
+use Filament\Notifications\Notification;
 
 class TransactionResource extends Resource
 {
@@ -157,6 +158,10 @@ class TransactionResource extends Resource
                     ->modalHeading(fn (Transaction $record) => "Selesaikan Pesanan {$record->invoice}?")
                     ->action(function (Transaction $record) {
                         $record->update(['status' => 'completed']);
+                        Notification::make()
+                            ->title('Pesanan Telah Selesai')
+                            ->success()
+                            ->send();
                     })
                     ->visible(fn (Transaction $record): bool => $record->status === 'paid'),
                 

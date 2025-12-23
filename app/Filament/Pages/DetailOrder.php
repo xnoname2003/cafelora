@@ -40,7 +40,7 @@ class DetailOrder extends Page implements HasForms
             'payments'
         ])->where('invoice', $invoice)->firstOrFail();
 
-        if ($this->transaction->status !== 'paid') {
+        if (!in_array($this->transaction->status, ['paid', 'completed'])) {
             $this->generateSnapToken();
         }
 
@@ -189,58 +189,59 @@ class DetailOrder extends Page implements HasForms
     public function generateSnapToken()
     {
         $transaction = $this->transaction;
-        $payment = $transaction->payments()->latest()->first();
-        $snap_token = '';
 
-        if ($snap_token == null || $payment == null || $payment->status != 'paid') {
+        $payment = $transaction->payments()->where('payment_method', 'midtrans')->latest()->first();
+
+        if ($payment === null || !in_array($payment->status, ['paid', 'completed', 'pending'])) {
             \Midtrans\Config::$serverKey = config('midtrans.server_key');
             \Midtrans\Config::$clientKey = config('midtrans.client_key');
             \Midtrans\Config::$isProduction = config('midtrans.is_production');
             \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
             \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
 
-            $transaction_details = array(
+            $transaction_details = [
                 'order_id' => $transaction->invoice,
-                'gross_amount' => $transaction->total,
-            );
+                'gross_amount' => (int) $transaction->total,
+            ];
 
-            $casier_details = array(
+            $customer_details = [
                 'first_name' => $transaction->user->name ?? 'Guest',
                 'email' => $transaction->user->email ?? 'guest@example.com',
-            );
+            ];
 
             $item_details = [];
             foreach ($transaction->items as $item) {
-                $item_details[] = array(
+                $item_details[] = [
                     'id' => $item->id,
-                    'price' => $item->price,
-                    'quantity' => $item->quantity,
+                    'price' => (int) $item->price,
+                    'quantity' => (int) $item->quantity,
                     'name' => $item->menu->name . ($item->variant ? ' - ' . $item->variant->name : ''),
-                );
+                ];
             }
 
-            $checkout = array(
+            $checkout = [
                 'transaction_details' => $transaction_details,
-                'customer_details' => $casier_details,
+                'customer_details' => $customer_details,
                 'item_details' => $item_details,
-            );
+            ];
 
             try {
                 $snap_token = \Midtrans\Snap::getSnapToken($checkout);
                 Payment::updateOrCreate(
-                    ['transaction_id' => $transaction->id],
+                    ['transaction_id' => $transaction->id, 'payment_method' => 'midtrans'],
                     [
                         'amount' => $transaction->total,
                         'status' => 'pending',
                         'snap_token' => $snap_token,
-                        'payment_method' => 'midtrans',
-                    ],
+                    ]
                 );
+                $this->snapToken = $snap_token;
             } catch (\Exception $e) {
-                Notification::make()->title($e->getMessage())->danger()->send();
+                \Illuminate\Support\Facades\Log::error('Midtrans Snap Token Error: ' . $e->getMessage(), ['checkout' => $checkout]);
+                Notification::make()->title('Gagal memuat pembayaran online')->body('Terjadi kesalahan saat menghubungi penyedia pembayaran.')->danger()->send();
             }
-
-            $this->snapToken = $snap_token;
+        } elseif ($payment) {
+            $this->snapToken = $payment->snap_token;
         }
     }
 

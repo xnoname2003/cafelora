@@ -84,7 +84,7 @@
 
         <!-- Right Column: Payment -->
         <div class="flex flex-col gap-4">
-            @if ($transaction->status != 'paid' && isset($snapToken))
+            @if (!in_array($transaction->status, ['paid', 'completed']) && isset($snapToken))
                 <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
                     <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Metode Pembayaran</h3>
 
@@ -137,6 +137,13 @@
                     <x-heroicon-o-check-circle class="w-16 h-16 text-green-500 mb-4" />
                     <p class="text-xl font-bold text-green-700 dark:text-green-400">Pembayaran Berhasil</p>
                     <p class="text-gray-600 dark:text-gray-400 mt-2">Transaksi ini sudah lunas.</p>
+                </div>
+            @elseif($transaction->status == 'completed')
+                <div
+                    class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 flex flex-col items-center justify-center text-center">
+                    <x-heroicon-o-check-badge class="w-16 h-16 text-green-500 mb-4" />
+                    <p class="text-xl font-bold text-green-700 dark:text-green-400">Pesanan Selesai</p>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">Pesanan ini sudah selesai.</p>
                 </div>
             @endif
         </div>

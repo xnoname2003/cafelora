@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Actions\Action;
 use App\Filament\Pages\DetailOrder;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\DB;
 
 class TransactionResource extends Resource
 {
@@ -157,7 +158,11 @@ class TransactionResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading(fn (Transaction $record) => "Selesaikan Pesanan {$record->invoice}?")
                     ->action(function (Transaction $record) {
-                        $record->update(['status' => 'completed']);
+                        DB::transaction(function () use ($record) {
+                            $record->update(['status' => 'completed']);
+                            $record->payments()->where('transaction_id', $record->id)->update(['status' => 'completed']);
+                        });
+
                         Notification::make()
                             ->title('Pesanan Telah Selesai')
                             ->success()

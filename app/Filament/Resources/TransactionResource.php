@@ -16,6 +16,11 @@ use Filament\Tables\Actions\Action;
 use App\Filament\Pages\DetailOrder;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use App\Filament\Exports\TransactionReportExport;
+use Filament\Tables\Contracts\HasTable;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Excel as ExcelWriter;
 
 class TransactionResource extends Resource
 {
@@ -146,6 +151,45 @@ class TransactionResource extends Resource
                                 );
                         }),
 
+            ])
+            ->headerActions([
+                Action::make('export_xlsx')
+                    ->label('Export XLSX')
+                    ->icon('heroicon-o-table-cells')
+                    ->action(function (HasTable $livewire) {
+                        $query = $livewire->getFilteredSortedTableQuery();
+                        $filters = $livewire->tableFilters ?? [];
+                        $startDate = data_get($filters, 'date_range.from')
+                            ?? data_get($filters, 'date.created_at');
+                        $endDate = data_get($filters, 'date_range.until')
+                            ?? data_get($filters, 'date.created_at');
+                        $filename = 'SalesReport-' . date('YmdHis') . '-' . Str::upper(Str::random(4)) . '.xlsx';
+
+                        return Excel::download(
+                            new TransactionReportExport($query, 'xlsx', $startDate, $endDate),
+                            $filename,
+                            ExcelWriter::XLSX
+                        );
+                    }),
+                Action::make('export_pdf')
+                    ->label('Export PDF')
+                    ->icon('heroicon-o-document-text')
+                    ->action(function (HasTable $livewire) {
+                        $query = $livewire->getFilteredSortedTableQuery();
+                        $filters = $livewire->tableFilters ?? [];
+                        $startDate = data_get($filters, 'date_range.from')
+                            ?? data_get($filters, 'date.created_at');
+                        $endDate = data_get($filters, 'date_range.until')
+                            ?? data_get($filters, 'date.created_at');
+                        $filename = 'SalesReport-' . date('YmdHis') . '-' . Str::upper(Str::random(4)) . '.pdf';
+
+                        return Excel::download(
+                            new TransactionReportExport($query, 'pdf', $startDate, $endDate),
+                            $filename,
+                            ExcelWriter::DOMPDF
+                        );
+                    }),
+                    
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()

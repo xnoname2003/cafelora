@@ -16,7 +16,7 @@
             request('max_price') ||
             request('category') ||
             request()->routeIs('customer.category.show');
-        $firstMenuId = $filteredMenus[0]->id ?? null; // Digunakan di script scroll
+        $firstMenuId = $filteredMenus[0]->id ?? null;
     @endphp
 
     @vite('resources/css/app.css')
@@ -520,7 +520,7 @@
     </div>
 
     <footer class="mt-16 text-center text-soft-brown-500 text-sm pb-8 px-4 md:px-8">
-        <p>&copy; {{ date('Y') }} Sistem {{ config('app.name', 'Restoran') }}. Dibuat dengan Laravel & Filament.
+        <p>&copy; {{ date('Y') }} Sistem Daftar Menu Caffee {{ config('app.name', 'Restoran') }}.
         </p>
     </footer>
 
@@ -548,36 +548,38 @@
             const iconMenu = document.getElementById('icon-menu');
             const iconClose = document.getElementById('icon-close');
 
-            const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+            let lastWidth = window.innerWidth;
 
-            if (!isDesktop) {
-                filterContent.style.maxHeight = '0';
-                filterContent.style.opacity = '0';
-                filterContent.style.overflow = 'hidden';
-                filterContent.classList.remove('flex');
-            }
+            const setInitialState = () => {
+                const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+                if (!isDesktop) {
+                    filterContent.style.maxHeight = '0';
+                    filterContent.style.opacity = '0';
+                    filterContent.style.overflow = 'hidden';
+                } else {
+                    filterContent.style.maxHeight = 'none';
+                    filterContent.style.opacity = '1';
+                    filterContent.style.display = 'flex';
+                }
+            };
+
+            setInitialState();
 
             toggleButton.addEventListener('click', function() {
                 if (!window.matchMedia('(min-width: 768px)').matches) {
-                    const isHidden = filterContent.style.maxHeight === '0px' || filterContent.style
-                        .maxHeight === '';
+                    const isHidden = filterContent.style.maxHeight === '0px' || filterContent.style.maxHeight === '0';
 
                     if (isHidden) {
                         filterContent.style.display = 'flex';
-                        filterContent.classList.add('flex');
-                        filterContent.style.maxHeight = filterContent.scrollHeight + 'px';
-                        filterContent.style.opacity = '1';
-
+                        setTimeout(() => {
+                            filterContent.style.maxHeight = filterContent.scrollHeight + 'px';
+                            filterContent.style.opacity = '1';
+                        }, 10);
                         iconMenu.classList.add('hidden');
                         iconClose.classList.remove('hidden');
                     } else {
-                        filterContent.style.maxHeight = filterContent.scrollHeight + 'px';
-
-                        setTimeout(() => {
-                            filterContent.style.maxHeight = '0';
-                            filterContent.style.opacity = '0';
-                        }, 10);
-
+                        filterContent.style.maxHeight = '0';
+                        filterContent.style.opacity = '0';
                         iconMenu.classList.remove('hidden');
                         iconClose.classList.add('hidden');
                     }
@@ -585,22 +587,22 @@
             });
 
             window.addEventListener('resize', function() {
-                const isDesktop = window.matchMedia('(min-width: 768px)').matches;
-                if (isDesktop) {
-                    filterContent.style.maxHeight = 'none';
-                    filterContent.style.opacity = '1';
-                    filterContent.style.overflow = 'visible';
-                    filterContent.style.display = 'flex';
-                    filterContent.classList.remove('hidden');
-                    filterContent.classList.add('flex');
-                    iconMenu.classList.remove('hidden');
-                    iconClose.classList.add('hidden');
-                } else {
-                    filterContent.style.maxHeight = '0';
-                    filterContent.style.opacity = '0';
-                    filterContent.style.overflow = 'hidden';
-                    iconMenu.classList.remove('hidden');
-                    iconClose.classList.add('hidden');
+                if (window.innerWidth !== lastWidth) {
+                    lastWidth = window.innerWidth;
+                    const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+                    
+                    if (isDesktop) {
+                        filterContent.style.maxHeight = 'none';
+                        filterContent.style.opacity = '1';
+                        filterContent.style.display = 'flex';
+                        iconMenu.classList.remove('hidden');
+                        iconClose.classList.add('hidden');
+                    } else {
+                        filterContent.style.maxHeight = '0';
+                        filterContent.style.opacity = '0';
+                        iconMenu.classList.remove('hidden');
+                        iconClose.classList.add('hidden');
+                    }
                 }
             });
         });

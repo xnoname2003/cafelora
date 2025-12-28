@@ -87,7 +87,7 @@ class MenuController extends Controller
         }
     }
 
-    public function showCustomer(Menu $menu)
+    public function showDetailMenu(Menu $menu)
     {
         $menu->load(['category', 'variants', 'toppings']);
 

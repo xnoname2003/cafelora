@@ -17,7 +17,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     /**
      * FORM
@@ -77,13 +77,23 @@ class UserResource extends Resource
 
                 Tables\Columns\TextColumn::make('roles.name')
                     ->label('Role')
-                    ->badge(),
+                    ->badge()
+                    ->color(function ($state) {
+                        $role = is_array($state) ? ($state[0] ?? null) : $state;
+
+                        return match ($role) {
+                            'admin' => 'success',
+                            'staff' => 'warning',
+                            default => 'gray',
+                        };
+                    }),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

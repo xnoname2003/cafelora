@@ -55,44 +55,29 @@ class MenuSystemSeeder extends Seeder
             Variant::firstOrCreate($v);
         }
 
-        // menu items
-        $menuNames = [
-            'Americano', 'Cappuccino', 'Cafe Latte', 'Mocha',
-            'Vanilla Latte', 'Hazelnut Latte', 'Thai Tea', 'Matcha Latte',
-            'Milkshake Chocolate', 'Milkshake Strawberry',
-            'French Fries', 'Chicken Popcorn', 'Spicy Wings',
-            'Brownies', 'Cheesecake',
-            'Black Tea', 'Green Tea', 'Lemon Tea'
-        ];
+        $menuItems = require database_path('seeders/data/menu_items.php');
 
-        foreach ($menuNames as $name) {
-            $baseUrl = 'https://placehold.co/1920x1080?text=';
-            $fontImage = '&font=roboto';
-            $menu = Menu::create([
-                'category_id' => Category::inRandomOrder()->first()->id,
-                'name' => $name,
-                'description' => "Delicious $name from our cafe.",
-                'base_price' => rand(15000, 35000),
-                'stock' => rand(5, 30),
-                'sales_qty' => rand(5, 30),
-                'image' => $baseUrl . urlencode($name) . $fontImage,
-            ]);
+        foreach ($menuItems as $item) {
+            $categoryId = Category::firstOrCreate(['name' => $item['category']])->id;
 
-            // Relasi topping acak 0–3 topping
-            $randomToppings = Topping::inRandomOrder()
-                ->limit(rand(0, 3))
-                ->pluck('id')
-                ->toArray();
+            $menu = Menu::updateOrCreate(
+                ['name' => $item['name']],
+                [
+                    'category_id' => $categoryId,
+                    'name' => $item['name'],
+                    'description' => $item['description'],
+                    'base_price' => $item['base_price'],
+                    'stock' => rand(5, 30),
+                    'sales_qty' => rand(5, 30),
+                    'image' => $item['image'],
+                ]
+            );
 
-            $menu->toppings()->sync($randomToppings);
+            $toppingIds = Topping::whereIn('name', $item['toppings'])->pluck('id')->toArray();
+            $menu->toppings()->sync($toppingIds);
 
-            // Relasi variant acak 2 variant
-            $randomVariants = Variant::inRandomOrder()
-                ->limit(2)
-                ->pluck('id')
-                ->toArray();
-
-            $menu->variants()->sync($randomVariants);
+            $variantIds = Variant::whereIn('name', $item['variants'])->pluck('id')->toArray();
+            $menu->variants()->sync($variantIds);
         }
     }
 }

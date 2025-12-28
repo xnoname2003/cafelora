@@ -14,7 +14,7 @@ class ToppingResource extends Resource
 {
     protected static ?string $model = Topping::class;
     protected static ?string $navigationGroup = 'Menu Management';
-    protected static ?string $navigationIcon = 'heroicon-o-adjustments-vertical';
+    protected static ?string $navigationIcon = 'heroicon-o-sparkles';
 
 
     public static function form(Form $form): Form

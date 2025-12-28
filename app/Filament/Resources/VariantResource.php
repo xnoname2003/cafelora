@@ -15,7 +15,7 @@ class VariantResource extends Resource
 {
     protected static ?string $model = Variant::class;
     protected static ?string $navigationGroup = 'Menu Management';
-    protected static ?string $navigationIcon = 'heroicon-o-adjustments-vertical';
+    protected static ?string $navigationIcon = 'heroicon-o-arrows-right-left';
 
     public static function form(Form $form): Form
     {

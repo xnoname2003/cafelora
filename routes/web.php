@@ -13,7 +13,7 @@ Route::get('/', [MenuController::class, 'indexCustomer'])->name('customer.menu.i
 Route::get('/category/{name}', [MenuController::class, 'showByCategory'])->name('customer.category.show');
 
 // 3. Rute Detail Menu (Menggunakan Model Binding {menu})
-Route::get('/menu/{menu}', [MenuController::class, 'showCustomer'])->name('customer.menu.show');
+Route::get('/menu/{menu}', [MenuController::class, 'showDetailMenu'])->name('customer.menu.show');
 
 Route::get('/receipt/{transaction}', [ReceiptController::class, 'show'])
     ->name('receipt.show');

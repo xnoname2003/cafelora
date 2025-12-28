@@ -17,12 +17,14 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn; 
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\TextEntry\TextEntrySize;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
     protected static ?string $navigationGroup = 'Menu Management';
-    protected static ?string $navigationIcon = 'heroicon-o-square-3-stack-3d';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
 
 
     public static function form(Form $form): Form
@@ -56,6 +58,21 @@ class MenuResource extends Resource
                 ->maxSize(2048)
                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                 ->image()
+                ->fetchFileInformation(false)
+                ->getUploadedFileUsing(function ($component, string $file, string | array | null $storedFileNames): ?array {
+                    if (Str::startsWith($file, 'images/cafelora-menu/')) {
+                        $url = asset($file);
+                    } else {
+                        $url = Storage::disk('public')->url($file);
+                    }
+
+                    return [
+                        'name' => is_array($storedFileNames) ? ($storedFileNames[$file] ?? basename($file)) : ($storedFileNames ?? basename($file)),
+                        'size' => 0,
+                        'type' => null,
+                        'url' => $url,
+                    ];
+                })
                 ->dehydrated(fn ($state) => filled($state))
                 ->nullable(),
 
@@ -100,7 +117,20 @@ class MenuResource extends Resource
                     ->sortable(),
                 
                 Tables\Columns\ImageColumn::make('image')
-                    ->label('Gambar'), 
+                    ->label('Gambar')
+                    ->getStateUsing(function (Menu $record): ?string {
+                        $image = $record->image;
+
+                        if (blank($image)) {
+                            return null;
+                        }
+
+                        if (Str::startsWith($image, 'images/cafelora-menu/')) {
+                            return asset($image);
+                        }
+
+                        return $image;
+                    }), 
 
                 Tables\Columns\TextColumn::make('base_price')
                     ->label('Harga Dasar')

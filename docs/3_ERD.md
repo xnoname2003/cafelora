@@ -1,5 +1,5 @@
 ---
-# Entity Relationship Diagram (ERD) Sistem CafeLora
+# Entity Relationship Diagram (ERD) Sistem Cafelora
 
 ---
 ## Deskripsi Entity Relationship Diagram (ERD) Cafelora
@@ -178,7 +178,7 @@ Relasi menu ↔ varian.
 
 | Kolom      | Tipe Data | Fungsi         |
 |------------|-----------|----------------|
-| id         | int       | Primary key    |
+| id         | int       | *Primary key*  |
 | menu_id    | int       | FK menus.id    |
 | variant_id | int       | FK variants.id |
 

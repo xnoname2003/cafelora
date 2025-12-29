@@ -10,7 +10,7 @@ Midtrans adalah layanan *payment gateway* di Indonesia yang membantu bisnis mene
 ## Lingkup Pendukung
 
 1. **Website Utama**: https://midtrans.com/
-2. **Halaman Dashboard Production**: https://dashboard.midtrans.com/l
+2. **Halaman Dashboard Production**: https://dashboard.midtrans.com/
 3. **Halaman Dashboard Sandbox**: https://dashboard.sandbox.midtrans.com/
 4. **Github**: https://github.com/Midtrans/midtrans-php
 

@@ -20,7 +20,7 @@
 | 12. | Alip Khoeril Akbar | Frontend (Pelanggan)                                            | Membuat Fitur Search Pada Halaman Frontend (Pelanggan) Berdasarkan Nama menu, Harga, Kategori                                                                        | 7/12/2025         |
 | 13. | Alip Khoeril Akbar | Frontend (Pelanggan)                                            | Membuat Fitur Search Pada Halaman Frontend (Pelanggan) Berdasarkan Nama menu, Harga, Kategori                                                                        | 8/12/2025         |
 | 14. | Alip Khoeril Akbar | Frontend (Pelanggan)                                            | Fix URL Filter Frontend (Pelanggan)                                                                                  | 10/12/2025        |
-| 15. | Muhammad Fauzan    | Menu Transaction Management                                     | Transactions dan POS Kasir                                                                                        | 10/11/2025        |
+| 15. | Muhammad Fauzan    | Menu Transaction Management                                     | Transactions dan POS Kasir                                                                                        | 10/12/2025        |
 | 16. | Revalina Adelia    | Dokumentasi                                                     | Menambahkan Dokumentasi Fitur, Tampilan, Instalasi, dan Agenda                                                                                       | 12/12/2025        |
 | 17. | Alip Khoeril Akbar | Membuat Halaman Detail Menu dari Setiap Menu                    | Membuat Halaman Detail Menu dari Setiap Menu                                                                                         | 13/12/2025        |
 | 18. | Alip Khoeril Akbar | Membuat Section Rekomendasi Menu (BestSeller) dan Fix Responsif | Membuat Section Rekomendasi Menu (BestSeller) dan Fix Responsif                                                                                    | 13/12/2025        |
@@ -143,8 +143,8 @@ Pengujian dilakukan langsung pada setiap fitur yang dikembangkan untuk memastika
 
 | No. | Fitur                     | Skenario Uji Fungsionalitas             | Status           | Tanggal          |
 |-----|---------------------------|-----------------------------------------|------------------|------------------|
-| 1   | Penambahan Item Transaksi | Item berhasil ditambahkan ke transaksi  | ✅ Selesai       | 10 Desember 2025 |
-| 2   | Dropdown Menu & Varian    | Harga berubah otomatis sesuai varian    | ✅ Selesai       | 8 Desember 2025  |
+| 1   | Dropdown Menu & Varian    | Harga berubah otomatis sesuai varian    | ✅ Selesai       | 8 Desember 2025  |
+| 2   | Penambahan Item Transaksi | Item berhasil ditambahkan ke transaksi  | ✅ Selesai       | 10 Desember 2025 |
 
 ---
 ### Tahap 3 - Integrasi Sistem & POS (Rabu, 10 Desember 2025 - Sabtu, 13 Desember 2025)
@@ -180,7 +180,7 @@ Pengujian dilakukan langsung pada setiap fitur yang dikembangkan untuk memastika
 ---
 #### 1. Chaerul Cahyadi (Ketua)
  
-| No. | Fitur                 | Skenario Uji Fungsionalitas                   | Status      | Tanggal Mulai       |
+| No. | Fitur                 | Skenario Uji Fungsionalitas                   | Status      | Tanggal             |
 |-----|-----------------------|-----------------------------------------------|-------------|---------------------|
 | 1   | *Payment Gateway*     | Transaksi berhasil diproses melalui Midtrans  | ✅ Selesai  | 17 Desember 2025    |
 | 2   | *Workflow* Transaksi  | Status transaksi berubah sesuai alur          | ✅ Selesai  | 22 Desember 2025    |
@@ -188,7 +188,7 @@ Pengujian dilakukan langsung pada setiap fitur yang dikembangkan untuk memastika
 
 #### 2. Revalina Adelia
 
-| No. | Fitur                     | Skenario Uji Fungsionalitas                    | Status     | Tanggal Mulai    |
+| No. | Fitur                     | Skenario Uji Fungsionalitas                    | Status     | Tanggal          |
 |-----|---------------------------|------------------------------------------------|------------|------------------|
 | 1   | Laporan & Export          | Laporan dapat difilter dan diekspor PDF/Excel  | ✅ Selesai | 26 Desember 2025 |
 | 2   | Dokumentasi Akhir         | README & dokumentasi lengkap dan konsisten     | ✅ Selesai | 29 Desember 2025 |

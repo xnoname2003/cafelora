@@ -366,7 +366,7 @@
                                                     <span
                                                         class="text-xs font-semibold text-soft-brown-700 block mb-1">Pilihan
                                                         Varian:</span>
-                                                    <div class="flex flex-wrap gap-2 min-h-[28px]">
+                                                    <div class="flex flex-wrap gap-2 min-h-7">
                                                         @if ($menu->variants->isNotEmpty())
                                                             @foreach ($menu->variants as $variant)
                                                                 <span
@@ -414,8 +414,13 @@
                         <section>
                             <a href="{{ route('customer.category.show', ['name' => $category->name]) }}">
                                 <h2
-                                    class="text-2xl md:text-3xl font-extrabold text-soft-brown-700 mb-6 uppercase tracking-wide hover:text-soft-brown-500 transition duration-150">
-                                    {{ $category->name }} &rarr;
+                                    class="inline-flex items-center gap-2 text-2xl md:text-3xl font-extrabold text-soft-brown-700 mb-6 uppercase tracking-wide hover:text-soft-brown-500 transition duration-150">
+                                    {{ $category->name }}
+                                    <svg class="inline-block align-middle" width="40" height="40"
+                                        viewBox="0 0 576 512" fill="currentColor" aria-hidden="true">
+                                        <path
+                                            d="M566.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-128-128c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L466.7 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l434.7 0-73.4 73.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l128-128z" />
+                                    </svg>
                                 </h2>
                             </a>
 

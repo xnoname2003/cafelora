@@ -36,8 +36,13 @@
     <nav class="w-full bg-soft-brown-300 shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex items-center py-4 px-8">
             <a href="{{ route('customer.menu.index') }}"
-                class="text-xl font-bold text-soft-brown-100 hover:text-white transition">
-                &larr; Kembali ke Daftar Menu
+                class="inline-flex items-center gap-2 text-xl font-bold text-soft-brown-100 hover:text-white transition">
+                <svg class="inline-block align-middle" width="20" height="20"
+                    viewBox="0 0 512 512" fill="currentColor" aria-hidden="true">
+                    <path
+                        d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 288 480 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-370.7 0 105.4-105.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z" />
+                </svg>
+                Kembali ke Daftar Menu
             </a>
         </div>
     </nav>
